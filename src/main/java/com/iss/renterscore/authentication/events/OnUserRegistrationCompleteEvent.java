@@ -1,0 +1,24 @@
+package com.iss.renterscore.authentication.events;
+
+import com.iss.renterscore.authentication.model.Users;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.web.util.UriComponentsBuilder;
+
+@Getter @Setter
+public class OnUserRegistrationCompleteEvent extends ApplicationEvent {
+
+	private transient UriComponentsBuilder redirectUrl;
+	private Users users;
+	private String baseUrl;
+	
+	public OnUserRegistrationCompleteEvent(UriComponentsBuilder redirectUrl, Users users, String baseUrl) {
+		super(users);
+		this.redirectUrl = redirectUrl;
+		this.users = users;
+		this.baseUrl = baseUrl;
+	}
+
+}
