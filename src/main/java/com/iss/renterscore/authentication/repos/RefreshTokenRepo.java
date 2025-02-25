@@ -1,6 +1,7 @@
 package com.iss.renterscore.authentication.repos;
 
 import com.iss.renterscore.authentication.model.RefreshToken;
+import com.iss.renterscore.authentication.model.Users;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -24,6 +25,6 @@ public interface RefreshTokenRepo extends JpaRepository<RefreshToken, Long> {
 
     @Transactional
     @Query("SELECT t FROM RefreshToken t WHERE t.user = :user AND t.deviceId = :deviceId")
-    RefreshToken findByUserIdAndDeviceId(@Param("user") Long userId, @Param("deviceId") String deviceId);
+    RefreshToken findByUserIdAndDeviceId(@Param("user") Users user, @Param("deviceId") String deviceId);
 
 }

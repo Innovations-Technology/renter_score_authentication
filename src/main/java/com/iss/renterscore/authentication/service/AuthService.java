@@ -79,7 +79,7 @@ public class AuthService {
         Users currentUser = (Users) authentication.getPrincipal();
         String deviceId = loginRequest.getDeviceId();
         if (deviceId != null) {
-            refreshTokenService.deleteByUserIdAndDeviceId(currentUser.getId(), deviceId);
+            refreshTokenService.deleteByUserIdAndDeviceId(currentUser, deviceId);
         }
         RefreshToken refreshToken = refreshTokenService.createRefreshToken();
         refreshToken.setUser(currentUser);

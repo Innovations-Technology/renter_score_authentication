@@ -18,6 +18,7 @@ public class UserProfile extends BaseModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_profile_seq")
+    @SequenceGenerator(name = "user_profile_seq", allocationSize = 1)
     @Column(name = "user_profile_id")
     private Long id;
     private String email;
