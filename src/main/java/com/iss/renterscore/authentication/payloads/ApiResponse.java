@@ -8,7 +8,6 @@ import java.time.Instant;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
-@RequiredArgsConstructor
 public class ApiResponse {
 
 	private final String data;
