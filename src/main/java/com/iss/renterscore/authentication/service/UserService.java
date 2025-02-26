@@ -53,10 +53,6 @@ public class UserService {
         users.setEmailVerificationStatus(EmailVerificationStatus.STATUS_PENDING);
         users.setVerificationToken(generateNewToken());
         users.setExpiryDate(Instant.now().plusMillis(emailVerificationExpirationDuration));
-    //    users.setCreatedUser(0L);
-    //    users.setModifiedUser(0L);
-   //     users.setCreatedDate(Instant.now());
-    //    users.setModifiedDate(Instant.now());
         return users;
     }
 
@@ -66,10 +62,7 @@ public class UserService {
         profile.setPropertyRole(PropertyRole.ROLE_TENANT);
         profile.setFirstName(registrationRequest.getFirstName());
         profile.setLastName(registrationRequest.getLastName());
-    //    profile.setCreatedUser(0L);
-   //     profile.setModifiedUser(0L);
-   //     profile.setCreatedDate(Instant.now());
-   //     profile.setModifiedDate(Instant.now());
+        profile.setGender(Gender.DEFAULT);
         return profile;
     }
 
