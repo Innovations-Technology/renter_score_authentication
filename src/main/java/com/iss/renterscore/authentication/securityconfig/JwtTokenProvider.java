@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
@@ -84,6 +85,8 @@ public class JwtTokenProvider {
     }
 
     public SecretKey signSecretKey() {
-        return Jwts.SIG.HS512.key().build();
+        byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
+
+        return new SecretKeySpec(keyBytes, "HmacSHA256"); // Jwts.SIG.HS256.key().build();
     }
 }
