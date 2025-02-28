@@ -62,7 +62,7 @@ public class UserService {
         profile.setPropertyRole(PropertyRole.ROLE_TENANT);
         profile.setFirstName(registrationRequest.getFirstName());
         profile.setLastName(registrationRequest.getLastName());
-        profile.setGender(Gender.DEFAULT);
+        profile.setGender(Gender.OTHER);
         return profile;
     }
 

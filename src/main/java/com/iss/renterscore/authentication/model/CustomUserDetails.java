@@ -51,6 +51,6 @@ public class CustomUserDetails extends Users implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return super.getEmailVerificationStatus() == EmailVerificationStatus.STATUS_CONFIRMED;
+        return super.getEmailVerificationStatus() == EmailVerificationStatus.STATUS_VERIFIED;
     }
 }

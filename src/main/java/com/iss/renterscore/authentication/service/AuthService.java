@@ -53,11 +53,11 @@ public class AuthService {
     public Optional<Users> confirmEmailRegistration(String emailToken) {
         Users users = userService.findByEmailToken(emailToken)
                 .orElseThrow(() -> new ResourceNotFoundException("Token", "Email verification token not found", emailToken));
-        if (users.getEmailVerificationStatus() == EmailVerificationStatus.STATUS_CONFIRMED) {
+        if (users.getEmailVerificationStatus() == EmailVerificationStatus.STATUS_VERIFIED) {
             return Optional.of(users);
         }
         userService.verifyExpiration(users);
-        users.setEmailVerificationStatus(EmailVerificationStatus.STATUS_CONFIRMED);
+        users.setEmailVerificationStatus(EmailVerificationStatus.STATUS_VERIFIED);
         userService.save(users);
 
         return Optional.of(users);
@@ -66,7 +66,7 @@ public class AuthService {
     public Optional<Users> recreateRegistrationToken(String existingToken) {
         Optional<Users> userOpt = userService.findByEmailToken(existingToken);
         userOpt.orElseThrow(() -> new ResourceNotFoundException("Token", "Existing email verification", existingToken));
-        boolean userAlreadyVerified = userOpt.map(Users::getEmailVerificationStatus).filter(status -> status == EmailVerificationStatus.STATUS_CONFIRMED).isPresent();
+        boolean userAlreadyVerified = userOpt.map(Users::getEmailVerificationStatus).filter(status -> status == EmailVerificationStatus.STATUS_VERIFIED).isPresent();
         if (userAlreadyVerified) {
             return Optional.empty();
         }
