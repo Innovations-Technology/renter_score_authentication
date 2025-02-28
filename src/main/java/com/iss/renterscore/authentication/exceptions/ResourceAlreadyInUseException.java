@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(HttpStatus.IM_USED)
+@ResponseStatus(HttpStatus.CONFLICT)
 @Getter
 public class ResourceAlreadyInUseException extends RuntimeException{
 
@@ -17,8 +17,5 @@ public class ResourceAlreadyInUseException extends RuntimeException{
 		this.fieldName = fieldName;
 		this.fieldValue = fieldValue;
 	}
-	
-	
-	
 
 }

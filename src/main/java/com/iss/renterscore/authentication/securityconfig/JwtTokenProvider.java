@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
@@ -34,7 +35,7 @@ public class JwtTokenProvider {
                 .claim("email", userDetails.getUsername())
                 .issuedAt(Date.from(Instant.now()))
                 .expiration(Date.from(Instant.now().plusMillis(jwtExpirationInMs)))
-                .signWith(Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8)), Jwts.SIG.HS512)
+                .signWith(signSecretKey())
                 .compact();
     }
 
@@ -44,7 +45,7 @@ public class JwtTokenProvider {
                 .claim("email", users.getEmail())
                 .issuedAt(Date.from(Instant.now()))
                 .expiration(Date.from(Instant.now().plusMillis(jwtExpirationInMs)))
-                .signWith(Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8)), Jwts.SIG.HS512)
+                .signWith(signSecretKey())
                 .compact();
     }
 
@@ -62,8 +63,7 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String token) {
         try {
-            SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
-            Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
+            Jwts.parser().verifyWith(signSecretKey()).build().parseSignedClaims(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             logger.error("Invalid JWT signature");
@@ -72,9 +72,8 @@ public class JwtTokenProvider {
     }
 
     public <T> T extractClaims(String token, Function<Claims, T> claimsFunction) {
-        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
         Claims claims = Jwts.parser()
-                .verifyWith(key)
+                .verifyWith(signSecretKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -83,5 +82,11 @@ public class JwtTokenProvider {
 
     public Long getExpiryDuration() {
         return jwtExpirationInMs;
+    }
+
+    public SecretKey signSecretKey() {
+        byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
+
+        return new SecretKeySpec(keyBytes, "HmacSHA256"); // Jwts.SIG.HS256.key().build();
     }
 }

@@ -22,6 +22,6 @@ public class RegistrationRequest {
 	private String password;
 
 	@JsonProperty("role")
-	private int role;
+	private String role;
 
 }

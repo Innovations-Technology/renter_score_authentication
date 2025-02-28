@@ -2,6 +2,7 @@ package com.iss.renterscore.authentication.service;
 
 import com.iss.renterscore.authentication.exceptions.TokenRefreshException;
 import com.iss.renterscore.authentication.model.RefreshToken;
+import com.iss.renterscore.authentication.model.Users;
 import com.iss.renterscore.authentication.repos.RefreshTokenRepo;
 import com.iss.renterscore.authentication.utils.Utils;
 import lombok.RequiredArgsConstructor;
@@ -54,8 +55,8 @@ public class RefreshTokenService {
         refreshTokenRepo.deleteById(id);
     }
 
-    public void deleteByUserIdAndDeviceId(Long userId, String deviceId) {
-        RefreshToken refreshToken = refreshTokenRepo.findByUserIdAndDeviceId(userId, deviceId);
+    public void deleteByUserIdAndDeviceId(Users user, String deviceId) {
+        RefreshToken refreshToken = refreshTokenRepo.findByUserIdAndDeviceId(user, deviceId);
         if (refreshToken != null) {
             refreshTokenRepo.delete(refreshToken);
         }
