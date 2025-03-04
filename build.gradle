@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.iss.renterscore'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.1'
 
 java {
 	toolchain {
@@ -22,7 +22,12 @@ configurations {
 repositories {
 	mavenCentral()
 }
-
+tasks.named('bootJar') {
+	archiveFileName = "spring-boot-api-${project.version}.jar"
+}
+tasks.named('jar') {
+	enabled = false
+}
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-freemarker'
