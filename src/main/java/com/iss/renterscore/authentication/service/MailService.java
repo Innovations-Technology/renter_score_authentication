@@ -46,7 +46,7 @@ public class MailService {
 	}
 
 	/*	User Registration complete Action  */
-	public void sendEmailVerification(String emailVerificationUrl, String to, String toName, String baseUrl) throws IOException, TemplateException, MessagingException {
+	public void sendEmailVerification(String emailVerificationUrl, String to, String toName, String baseUrl, String token) throws IOException, TemplateException, MessagingException {
 		
 		Mail mail = new Mail();
 		mail.setSubject("User Email Verification");
@@ -56,6 +56,7 @@ public class MailService {
 		mail.getModel().put("title", "Renter Score Application");
 		mail.getModel().put("baseUrl", baseUrl);
 		mail.getModel().put("userEmailTokenVerificationLink", emailVerificationUrl);
+		mail.getModel().put("verificationToken", token);
 		templateConfiguration.setClassForTemplateLoading(getClass(), basePackagePath);
 		Template template = templateConfiguration.getTemplate("email-verification.ftlh");
 		String mailContent = FreeMarkerTemplateUtils.processTemplateIntoString(template, mail.getModel());

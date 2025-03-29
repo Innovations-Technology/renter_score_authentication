@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @EnableJpaRepositories
@@ -26,5 +27,13 @@ public interface RefreshTokenRepo extends JpaRepository<RefreshToken, Long> {
     @Transactional
     @Query("SELECT t FROM RefreshToken t WHERE t.user = :user AND t.deviceId = :deviceId")
     RefreshToken findByUserIdAndDeviceId(@Param("user") Users user, @Param("deviceId") String deviceId);
+
+    @Transactional
+    @Query("SELECT t FROM RefreshToken t WHERE t.user = :user AND t.deviceId = :deviceId")
+    Optional<RefreshToken> findExistTokenByUserIdAndDeviceId(@Param("user") Users user, @Param("deviceId") String deviceId);
+
+    @Transactional
+    @Query("SELECT t FROM RefreshToken t WHERE t.user = :user")
+    List<RefreshToken> findByUserId(@Param("user") Users user);
 
 }

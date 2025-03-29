@@ -40,7 +40,7 @@ public class OnRegenerateEmailVerificationListener implements ApplicationListene
 		String baseUrl = event.getBaseUrl();
 		String emailConfirmationUrl = event.getRedirectUrl().queryParam("token", users.getVerificationToken()).toUriString();
 		try {
-			mailService.sendEmailVerification(emailConfirmationUrl, recipientAddress, users.getProfile().getFirstName(), baseUrl);
+			mailService.sendEmailVerification(emailConfirmationUrl, recipientAddress, users.getProfile().getFirstName(), baseUrl, users.getVerificationToken());
 		} catch (IOException | TemplateException | MessagingException e) {
 			logger.error(e.getMessage());
 			throw new MailSendException(recipientAddress, "Email Verification failed!");

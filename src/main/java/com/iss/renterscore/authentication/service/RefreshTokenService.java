@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -37,6 +38,10 @@ public class RefreshTokenService {
         return refreshTokenRepo.save(refreshToken);
     }
 
+    public void delete(RefreshToken refreshToken) {
+        refreshTokenRepo.delete(refreshToken);
+    }
+
     public RefreshToken createRefreshToken() {
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
@@ -59,6 +64,17 @@ public class RefreshTokenService {
         RefreshToken refreshToken = refreshTokenRepo.findByUserIdAndDeviceId(user, deviceId);
         if (refreshToken != null) {
             refreshTokenRepo.delete(refreshToken);
+        }
+    }
+
+    public Optional<RefreshToken> findExistTokenByUserIdAndDeviceId(Users user, String deviceId) {
+        return refreshTokenRepo.findExistTokenByUserIdAndDeviceId(user, deviceId);
+    }
+
+    public void deleteByUserId(Users user) {
+        List<RefreshToken> refreshTokens = refreshTokenRepo.findByUserId(user);
+        if (!refreshTokens.isEmpty()) {
+            refreshTokenRepo.delete(refreshTokens.get(0));
         }
     }
 
