@@ -28,11 +28,17 @@ public class JwtTokenProvider {
     private String jwtSecret;
     @Value("${app.jwt.expiration}")
     private Long jwtExpirationInMs;
+    @Value("${app.jwt.issuer}")
+    private String issuer;
+    @Value("${app.jwt.audience}")
+    private String audience;
 
     public String generateToken(CustomUserDetails userDetails) {
         return Jwts.builder()
                 .subject(String.valueOf(userDetails.getId()))
                 .claim("email", userDetails.getUsername())
+                .issuer(issuer)
+                .audience().add(audience).and()
                 .issuedAt(Date.from(Instant.now()))
                 .expiration(Date.from(Instant.now().plusMillis(jwtExpirationInMs)))
                 .signWith(signSecretKey())
@@ -43,6 +49,8 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .subject(String.valueOf(users.getId()))
                 .claim("email", users.getEmail())
+                .issuer(issuer)
+                .audience().add(audience).and()
                 .issuedAt(Date.from(Instant.now()))
                 .expiration(Date.from(Instant.now().plusMillis(jwtExpirationInMs)))
                 .signWith(signSecretKey())
@@ -63,7 +71,12 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().verifyWith(signSecretKey()).build().parseSignedClaims(token);
+            Jwts.parser().
+                    verifyWith(signSecretKey())
+                    .requireIssuer(issuer)
+                    .requireAudience(audience)
+                    .build()
+                    .parseSignedClaims(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             logger.error("Invalid JWT signature");
@@ -74,6 +87,8 @@ public class JwtTokenProvider {
     public <T> T extractClaims(String token, Function<Claims, T> claimsFunction) {
         Claims claims = Jwts.parser()
                 .verifyWith(signSecretKey())
+                .requireIssuer(issuer)
+                .requireAudience(audience)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();

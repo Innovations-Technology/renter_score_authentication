@@ -55,8 +55,9 @@ jobs:
          username: ${{ secrets.DROPLET_USER }}
          key: ${{ secrets.SSH_PRIVATE_KEY }}
          script: |
+           echo "SSH connection successful"
            cd /root/renter-score
            docker-compose down
-           docker-compose pull
-           docker-compose up -d
+           docker-compose pull --ignore-pull-failures
+           docker-compose up -d --force-recreate
            docker image prune -af

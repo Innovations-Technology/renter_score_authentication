@@ -37,7 +37,7 @@
 							Dear ${userName},</h1>
 						<p class="" style="margin: 20px 0; font-size: 16px; mso-line-height-rule: exactly; line-height: 24px;">
 						<span style="font-weight: 400;">Thank you for joining <strong>Renter Score Property application</strong>, an efficient and smart solution to your property engagement.</span><br/><br/><span
-							style="font-weight: 400;">To complete the registration process, please confirm your email address to activate your account</span>
+							style="font-weight: 400;">To complete your registration, please verify your email address on your mobile device using the token below. The verification token will expire after 10 minutes.</span>
 							<table style="border: 0; width: 100%;" cellspacing="0" cellpadding="0">
 							  <tbody>
 							  <tr>
@@ -54,9 +54,9 @@
 											<a
 											class="button__a"
 											style="border-radius: 4px; color: #ffffff; display: block; font-family: sans-serif; font-size: 18px; font-weight: bold; mso-height-rule: exactly; line-height: 1.1; padding: 14px 18px; text-decoration: none; text-transform: none; border: 0;"
-											href="${userEmailTokenVerificationLink}"
+											href=""
 											target="_blank"
-											rel="noopener">Confirm email</a> <!--![endif]-->
+											rel="noopener">${verificationToken}</a> <!--![endif]-->
 										 </td>
 										</tr>
 										</tbody>

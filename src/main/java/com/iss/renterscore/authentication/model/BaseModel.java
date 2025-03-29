@@ -14,6 +14,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @RequiredArgsConstructor
@@ -25,13 +27,13 @@ public class BaseModel {
     @JsonProperty(value = "created_date")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "UTC")
     @Column(name = "created_date", nullable = false, updatable = false)
-    private Instant createdDate;
+    private LocalDateTime createdDate;
 
     @LastModifiedDate
     @JsonProperty(value = "modified_date")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "UTC")
     @Column(name = "modified_date", nullable = false)
-    private Instant modifiedDate;
+    private LocalDateTime modifiedDate;
 
     @CreatedBy
     @JsonProperty(value = "created_user")

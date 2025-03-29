@@ -2,9 +2,13 @@ package com.iss.renterscore.authentication.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 
@@ -33,6 +37,7 @@ public class Users extends BaseModel {
     private String password;
 
     @JsonProperty(value = "user_profile")
+    @JsonManagedReference
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private UserProfile profile;
 
@@ -47,6 +52,7 @@ public class Users extends BaseModel {
     private PropertyRole propertyRole;
 
     @JsonProperty(value = "verification_token")
+    @JsonIgnore
     @Column(name = "verification_token", nullable = false)
     private String verificationToken;
 

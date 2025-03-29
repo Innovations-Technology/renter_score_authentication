@@ -1,26 +1,29 @@
 package com.iss.renterscore.authentication.controller;
 
 import com.iss.renterscore.authentication.events.OnRegenerateEmailVerificationEvent;
+import com.iss.renterscore.authentication.events.OnUserLogoutSuccessEvent;
 import com.iss.renterscore.authentication.events.OnUserRegistrationCompleteEvent;
-import com.iss.renterscore.authentication.exceptions.InvalidTokenRequestException;
-import com.iss.renterscore.authentication.exceptions.TokenRefreshException;
-import com.iss.renterscore.authentication.exceptions.UserLoginException;
-import com.iss.renterscore.authentication.exceptions.UserRegistrationException;
+import com.iss.renterscore.authentication.exceptions.*;
 import com.iss.renterscore.authentication.model.CustomUserDetails;
 import com.iss.renterscore.authentication.model.RefreshToken;
 import com.iss.renterscore.authentication.model.Users;
 import com.iss.renterscore.authentication.payloads.*;
 import com.iss.renterscore.authentication.securityconfig.JwtTokenProvider;
 import com.iss.renterscore.authentication.service.AuthService;
+import com.iss.renterscore.authentication.service.CurrentUser;
+import com.iss.renterscore.authentication.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -36,6 +39,7 @@ public class AuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     private final AuthService authService;
+    private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
     private final ApplicationEventPublisher applicationEventPublisher;
 
@@ -63,8 +67,15 @@ public class AuthController {
     @GetMapping("/registration_confirmation")
     public ResponseEntity<?> confirmRegistration(@RequestParam("token") String token) {
         return authService.confirmEmailRegistration(token)
-                .map(users -> ResponseEntity.ok(new ApiResponse("User verified successfully", true)))
+                .map(users -> ResponseEntity.ok(new ApiResponse("User's email verified successfully", true)))
                 .orElseThrow(() -> new InvalidTokenRequestException("Email Verification Token", token, "Failed to verify. Please request a new email verification"));
+    }
+
+    @PostMapping("/verify")
+    public ResponseEntity<?> verifyRegistration(@Valid @RequestBody VerifyTokenRequest request) {
+        return authService.confirmEmailRegistration(request.getToken())
+                .map(users -> ResponseEntity.ok(new ApiResponse("User's email verified successfully", true)))
+                .orElseThrow(() -> new InvalidTokenRequestException("Email Verification Token", request.getToken(), "Failed to verify. Please request a new email verification"));
     }
 
     @GetMapping("/resend_registration_token")
@@ -78,9 +89,26 @@ public class AuthController {
                     OnRegenerateEmailVerificationEvent regenerateEmailVerificationEvent =
                             new OnRegenerateEmailVerificationEvent(urlBuilder, registeredUser, baseUrl);
                     applicationEventPublisher.publishEvent(regenerateEmailVerificationEvent);
-                    return ResponseEntity.ok(new ApiResponse("Email verification resent successfully", true));
+                    return ResponseEntity.ok(new ApiResponse("Email verification token resent successfully", true));
 
                 }).orElseThrow(() -> new InvalidTokenRequestException("Email Verification Token", existingToken, "No user associated with this request."));
+
+    }
+
+    @PostMapping("/resend_verification_token")
+    public ResponseEntity<?> resendRegistrationToken(@Valid @RequestBody EmailVerificationTokenRequest request) {
+        Users users = authService.recreateRegistrationToken(request.getEmail())
+                .orElseThrow(() -> new InvalidTokenRequestException("Email Verification Token", request.getEmail(), "User already verified."));
+        return Optional.ofNullable(users)
+                .map(registeredUser -> {
+                    String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+                    UriComponentsBuilder urlBuilder = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/v1/auth/registration_confirmation");
+                    OnRegenerateEmailVerificationEvent regenerateEmailVerificationEvent =
+                            new OnRegenerateEmailVerificationEvent(urlBuilder, registeredUser, baseUrl);
+                    applicationEventPublisher.publishEvent(regenerateEmailVerificationEvent);
+                    return ResponseEntity.ok(new ApiResponse("Email verification token resent successfully", true));
+
+                }).orElseThrow(() -> new InvalidTokenRequestException("Email Verification Token", request.getEmail(), "No user associated with this request."));
 
     }
 
@@ -115,5 +143,31 @@ public class AuthController {
                     return ResponseEntity.ok(new JwtAuthenticationResponse(updatedToken, refreshToken, jwtTokenProvider.getExpiryDuration()));
                 }).orElseThrow(() -> new TokenRefreshException(refreshRequest.getRefreshToken(), "Unexpected error during token refresh. Please login again."));
 
+    }
+
+    @GetMapping("/me")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN', 'MASTER')")
+    public ResponseEntity<?> getUserProfile(@CurrentUser CustomUserDetails currentUser) {
+        logger.info("Inside secured resource with user");
+        logger.info("{} has role : {}", currentUser.getEmail(), currentUser.getAuthorities());
+        Users users = userService.findByEmail(currentUser.getEmail())
+                .orElseThrow(() -> new ResourceNotFoundException("User email", currentUser.getEmail(), "Not found!"));
+        return ResponseEntity.ok(users);
+    }
+
+    @PostMapping("/update_profile")
+    public ResponseEntity<?> updateProfile(@CurrentUser CustomUserDetails currentUser, @RequestPart("user") UpdateRequest request, @RequestPart(value = "file", required = false) MultipartFile file) {
+        ApiResponse response = userService.updateProfile(currentUser, request, file)
+                .orElseThrow(() -> new UpdatePasswordException("---Empty---", "No such user present"));
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logoutUser(@CurrentUser CustomUserDetails customUserDetails, @Valid @RequestBody LogoutRequest logoutRequest) {
+        userService.logoutUser(customUserDetails, logoutRequest);
+        Object credentials = SecurityContextHolder.getContext().getAuthentication().getCredentials();
+        OnUserLogoutSuccessEvent logoutSuccessEvent = new OnUserLogoutSuccessEvent(customUserDetails.getEmail(), credentials.toString(), logoutRequest);
+        applicationEventPublisher.publishEvent(logoutSuccessEvent);
+        return ResponseEntity.ok(new ApiResponse("Log out successful", true));
     }
 }

@@ -63,14 +63,24 @@ public class AuthService {
         return Optional.of(users);
     }
 
-    public Optional<Users> recreateRegistrationToken(String existingToken) {
-        Optional<Users> userOpt = userService.findByEmailToken(existingToken);
-        userOpt.orElseThrow(() -> new ResourceNotFoundException("Token", "Existing email verification", existingToken));
+    public Optional<Users> recreateRegistrationToken(String email) {
+        Optional<Users> userOpt = userService.findByEmail(email);
+        userOpt.orElseThrow(() -> new ResourceNotFoundException("Token", "Existing email verification", email));
         boolean userAlreadyVerified = userOpt.map(Users::getEmailVerificationStatus).filter(status -> status == EmailVerificationStatus.STATUS_VERIFIED).isPresent();
         if (userAlreadyVerified) {
             return Optional.empty();
         }
-        return userOpt.map(userService::updateExistingTokenWithNameAndExpiry);
+        return userOpt.map(userService::updateNewTokenWithExpiry);
+    }
+
+    public Optional<Users> recreateVerificationToken(String email) {
+        Optional<Users> userOpt = userService.findByEmail(email);
+        userOpt.orElseThrow(() -> new ResourceNotFoundException("Token", "Existing email verification", email));
+        boolean userAlreadyVerified = userOpt.map(Users::getEmailVerificationStatus).filter(status -> status == EmailVerificationStatus.STATUS_VERIFIED).isPresent();
+        if (userAlreadyVerified) {
+            return Optional.empty();
+        }
+        return userOpt.map(userService::updateNewTokenWithExpiry);
     }
 
     /* Create Refresh token to refresh JWT token  */

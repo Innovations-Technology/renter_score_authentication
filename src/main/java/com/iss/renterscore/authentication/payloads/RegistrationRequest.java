@@ -1,6 +1,7 @@
 package com.iss.renterscore.authentication.payloads;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.iss.renterscore.authentication.model.PropertyRole;
 import lombok.*;
 
 @Data
@@ -22,6 +23,6 @@ public class RegistrationRequest {
 	private String password;
 
 	@JsonProperty("role")
-	private String role;
+	private PropertyRole role;
 
 }

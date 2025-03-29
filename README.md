@@ -1,3 +1,5 @@
+# RenterScoreAuthentication
+User Authentication
 # Getting Started
 
 ### Reference Documentation
