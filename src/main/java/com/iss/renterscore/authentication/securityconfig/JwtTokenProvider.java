@@ -3,8 +3,9 @@ package com.iss.renterscore.authentication.securityconfig;
 import com.iss.renterscore.authentication.exceptions.InvalidTokenRequestException;
 import com.iss.renterscore.authentication.model.CustomUserDetails;
 import com.iss.renterscore.authentication.model.Users;
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
 import java.util.function.Function;
+
+import static com.iss.renterscore.authentication.utils.Utils.EMAIL;
 
 
 @Component
@@ -36,7 +39,7 @@ public class JwtTokenProvider {
     public String generateToken(CustomUserDetails userDetails) {
         return Jwts.builder()
                 .subject(String.valueOf(userDetails.getId()))
-                .claim("email", userDetails.getUsername())
+                .claim(EMAIL, userDetails.getUsername())
                 .issuer(issuer)
                 .audience().add(audience).and()
                 .issuedAt(Date.from(Instant.now()))
@@ -48,7 +51,7 @@ public class JwtTokenProvider {
     public String generateTokenByUser(Users users) {
         return Jwts.builder()
                 .subject(String.valueOf(users.getId()))
-                .claim("email", users.getEmail())
+                .claim(EMAIL, users.getEmail())
                 .issuer(issuer)
                 .audience().add(audience).and()
                 .issuedAt(Date.from(Instant.now()))
@@ -58,7 +61,7 @@ public class JwtTokenProvider {
     }
 
     public String getEmailFromJwt(String token) {
-        return extractClaims(token, claims -> claims.get("email", String.class));
+        return extractClaims(token, claims -> claims.get(EMAIL, String.class));
     }
 
     public String getUserIdFromJwt(String token) {
@@ -102,6 +105,6 @@ public class JwtTokenProvider {
     public SecretKey signSecretKey() {
         byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
 
-        return new SecretKeySpec(keyBytes, "HmacSHA256"); // Jwts.SIG.HS256.key().build();
+        return new SecretKeySpec(keyBytes, "HmacSHA256");
     }
 }

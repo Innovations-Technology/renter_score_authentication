@@ -10,8 +10,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class OnRegenerateEmailVerificationEvent extends ApplicationEvent {
 
 	private transient UriComponentsBuilder redirectUrl;
-	private Users users;
-	private String baseUrl;
+	private final transient Users users;
+	private final String baseUrl;
 	public OnRegenerateEmailVerificationEvent(UriComponentsBuilder redirectUrl, Users users, String baseUrl) {
 		super(users);
 		this.redirectUrl = redirectUrl;

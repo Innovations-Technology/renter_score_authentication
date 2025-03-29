@@ -44,7 +44,6 @@ public class OnUserAccountChangeListener implements ApplicationListener<OnUserAc
 			mailService.sendAccountChangeEmail(action, actionStatus, recipientAddress, users.getProfile().getFirstName(), baseUrl);
 		} catch (IOException | TemplateException | MessagingException e) {
 			logger.error(e.getMessage());
-			e.printStackTrace();
 			throw new MailSendException(recipientAddress, "Account Change Mail");
 		}
 	}
