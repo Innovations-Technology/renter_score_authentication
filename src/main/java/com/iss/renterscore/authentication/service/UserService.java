@@ -1,6 +1,5 @@
 package com.iss.renterscore.authentication.service;
 
-import com.iss.renterscore.authentication.controller.AuthController;
 import com.iss.renterscore.authentication.exceptions.InvalidTokenRequestException;
 import com.iss.renterscore.authentication.exceptions.ResourceAlreadyInUseException;
 import com.iss.renterscore.authentication.exceptions.ResourceNotFoundException;
@@ -30,7 +29,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private static final SecureRandom RANDOM = new SecureRandom();
