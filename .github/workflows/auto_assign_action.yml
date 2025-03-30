@@ -23,4 +23,4 @@ jobs:
           numberOfReviewers: 0
           numberOfAssignees: 3
           exclude:
-            -sub-task
+            - sub-task
