@@ -2,7 +2,6 @@ package com.iss.renterscore.authentication.payloads;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.time.Instant;
 

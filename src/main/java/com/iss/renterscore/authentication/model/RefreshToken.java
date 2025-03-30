@@ -1,10 +1,14 @@
 package com.iss.renterscore.authentication.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.NaturalId;
 
 import java.time.Instant;
+import java.util.Objects;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -39,5 +43,17 @@ public class RefreshToken extends BaseModel{
 	public void increaseRefreshCount() {
 		refreshCount = refreshCount + 1;
 	}
-	
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null || getClass() != o.getClass()) return false;
+		if (!super.equals(o)) return false;
+		RefreshToken that = (RefreshToken) o;
+		return Objects.equals(id, that.id) && Objects.equals(token, that.token) && Objects.equals(refreshCount, that.refreshCount) && Objects.equals(expiryDate, that.expiryDate) && Objects.equals(user, that.user) && Objects.equals(deviceId, that.deviceId);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(super.hashCode(), id, token, refreshCount, expiryDate, user, deviceId);
+	}
 }

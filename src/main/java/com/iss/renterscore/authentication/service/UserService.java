@@ -56,7 +56,7 @@ public class UserService {
 
     public Users createUser(RegistrationRequest registrationRequest) {
 
-        if (existsByEmail(registrationRequest.getEmail())) {
+        if (Boolean.TRUE.equals(existsByEmail(registrationRequest.getEmail()))) {
             throw new ResourceAlreadyInUseException("Email", "Address", registrationRequest.getEmail());
         }
         Users users = new Users();

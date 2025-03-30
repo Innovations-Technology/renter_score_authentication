@@ -1,12 +1,13 @@
 package com.iss.renterscore.authentication.model;
 
+import lombok.EqualsAndHashCode;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
-
+@EqualsAndHashCode(callSuper = true)
 public class CustomUserDetails extends Users implements UserDetails {
 
     private final String email;

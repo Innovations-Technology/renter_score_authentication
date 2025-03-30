@@ -21,7 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -45,7 +44,7 @@ public class AuthController {
 
 
     @GetMapping("/hello")
-    public ResponseEntity<?> helloGreeting() {
+    public ResponseEntity<Object> helloGreeting() {
         return ResponseEntity.ok("<h1>Welcome to Renter Score Application</h1>" +
                 "<br /><br /><p><h3>This application is to enhance the Properties' solutions. </h3></p>");
     }

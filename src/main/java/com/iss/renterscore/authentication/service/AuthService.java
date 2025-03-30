@@ -29,7 +29,7 @@ public class AuthService {
 
     public Optional<Users> registerUser(RegistrationRequest request) {
         String email = request.getEmail();
-        if (emailAlreadyExist(email)) {
+        if (Boolean.TRUE.equals(emailAlreadyExist(email))) {
             throw new ResourceAlreadyInUseException("Email", "Address", email);
         }
         Users newUser = userService.createUser(request);
@@ -64,16 +64,6 @@ public class AuthService {
     }
 
     public Optional<Users> recreateRegistrationToken(String email) {
-        Optional<Users> userOpt = userService.findByEmail(email);
-        userOpt.orElseThrow(() -> new ResourceNotFoundException("Token", "Existing email verification", email));
-        boolean userAlreadyVerified = userOpt.map(Users::getEmailVerificationStatus).filter(status -> status == EmailVerificationStatus.STATUS_VERIFIED).isPresent();
-        if (userAlreadyVerified) {
-            return Optional.empty();
-        }
-        return userOpt.map(userService::updateNewTokenWithExpiry);
-    }
-
-    public Optional<Users> recreateVerificationToken(String email) {
         Optional<Users> userOpt = userService.findByEmail(email);
         userOpt.orElseThrow(() -> new ResourceNotFoundException("Token", "Existing email verification", email));
         boolean userAlreadyVerified = userOpt.map(Users::getEmailVerificationStatus).filter(status -> status == EmailVerificationStatus.STATUS_VERIFIED).isPresent();

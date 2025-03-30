@@ -29,7 +29,7 @@ public class LoggedOutJwtTokenCache {
 	public void markLogoutEventForToken(OnUserLogoutSuccessEvent event) {
 		String token = event.getToken();
 		if (tokenEventMap.containsKey(token)) {
-			logger.info(String.format("Log out token for user [%s] is already present in the cache", event.getEmail()));
+            logger.info("Log out token for user {} is already present in the cache", event.getEmail());
 		}else {
 			Date tokenExpiryDate = tokenProvider.getTokenExpiryFromJwt(token);
 			long ttlForToken = getTTLForToken(tokenExpiryDate);
