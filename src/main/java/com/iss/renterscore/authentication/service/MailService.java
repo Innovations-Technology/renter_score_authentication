@@ -1,6 +1,7 @@
 package com.iss.renterscore.authentication.service;
 
 import com.iss.renterscore.authentication.model.Mail;
+import com.iss.renterscore.authentication.utils.Utils;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -19,6 +20,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
+
+import static com.iss.renterscore.authentication.utils.Utils.*;
 
 @Service
 @RequiredArgsConstructor
@@ -49,12 +52,12 @@ public class MailService {
 	public void sendEmailVerification(String emailVerificationUrl, String to, String toName, String baseUrl, String token) throws IOException, TemplateException, MessagingException {
 		
 		Mail mail = new Mail();
-		mail.setSubject("User Email Verification");
+		mail.setSubject(EMAIL_VERIFICATION);
 		mail.setTo(to);
 		mail.setFrom(mailFrom);
-		mail.getModel().put("userName", toName);
-		mail.getModel().put("title", "Renter Score Application");
-		mail.getModel().put("baseUrl", baseUrl);
+		mail.getModel().put(Utils.USER_NAME, toName);
+		mail.getModel().put(TITLE, MAIL_TITLE);
+		mail.getModel().put(BASE_URL, baseUrl);
 		mail.getModel().put("userEmailTokenVerificationLink", emailVerificationUrl);
 		mail.getModel().put("verificationToken", token);
 		templateConfiguration.setClassForTemplateLoading(getClass(), basePackagePath);
@@ -68,12 +71,12 @@ public class MailService {
 		long expirationInMinutes = TimeUnit.MILLISECONDS.toMinutes(expiration);
 		String expirationInMinutesString = Long.toString(expirationInMinutes);
 		Mail mail = new Mail();
-		mail.setSubject("Password Reset Link");
+		mail.setSubject(PASSWORD_RESET_LINK);
 		mail.setTo(to);
 		mail.setFrom(mailFrom);
-		mail.getModel().put("userName", toName);
-		mail.getModel().put("title", "Renter Score Application");
-		mail.getModel().put("baseUrl", baseUrl);
+		mail.getModel().put(Utils.USER_NAME, toName);
+		mail.getModel().put(TITLE, MAIL_TITLE);
+		mail.getModel().put(BASE_URL, baseUrl);
 		mail.getModel().put("userResetPasswordLink", resetPasswordLink);
 		mail.getModel().put("expiration", expirationInMinutesString);
 		
@@ -86,13 +89,13 @@ public class MailService {
 	
 	public void sendAccountChangeEmail(String action, String actionStatus, String to, String toName, String baseUrl) throws IOException, TemplateException, MessagingException {
 		Mail mail = new Mail();
-		mail.setSubject("Account Status Change");
+		mail.setSubject(ACCOUNT_STATUS);
 		mail.setTo(to);
 		mail.setFrom(mailFrom);
-		mail.getModel().put("userName", toName);
+		mail.getModel().put(Utils.USER_NAME, toName);
 		mail.getModel().put("action", action);
-		mail.getModel().put("title", "Renter Score Application");
-		mail.getModel().put("baseUrl", baseUrl);
+		mail.getModel().put(TITLE, MAIL_TITLE);
+		mail.getModel().put(BASE_URL, baseUrl);
 		mail.getModel().put("actionStatus", actionStatus);
 		templateConfiguration.setClassForTemplateLoading(getClass(), basePackagePath);
 		Template template = templateConfiguration.getTemplate("account-activity-change.ftlh");

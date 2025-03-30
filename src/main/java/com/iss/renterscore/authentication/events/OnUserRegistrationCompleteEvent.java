@@ -2,7 +2,6 @@ package com.iss.renterscore.authentication.events;
 
 import com.iss.renterscore.authentication.model.Users;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.web.util.UriComponentsBuilder;
