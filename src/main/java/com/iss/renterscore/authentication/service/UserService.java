@@ -38,7 +38,7 @@ public class UserService {
     private final RefreshTokenService refreshTokenService;
 
     @Value("${app.token.email.verification.duration}")
-    private Long emailVerificationExpirationDuration;
+    public Long emailVerificationExpirationDuration;
 
     public Optional<Users> findByEmail(String email) {
         return userRepo.findByEmail(email);
