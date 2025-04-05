@@ -4,8 +4,6 @@ name: Auto Assign Reviewers and Assignees
 on:
   pull_request:
     types: [opened]
-    branches:
-      - develop
 
 jobs:
   add-reviews:
