@@ -21,18 +21,26 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Run Tests with Gradle
-        run: ./gradlew test
-
-      - name: Publish test results
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: build/test-results/test
-
       - name: Gradle Caching
         uses: actions/cache@v3
         with:
           path: ~/.gradle/caches
           key: gradle-cache-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: gradle-cache
+
+      - name: Run Tests with Gradle
+        run: ./gradlew clean test jacocoTestReport jacocoTestCoverageVerification
+
+      - name: Upload Jacoco HTML Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-html
+          path: build/reports/jacoco/test/html
+
+      - name: Upload Jacoco XML Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-xml
+          path: build/reports/jacoco/test/jacocoTestReport.xml
+
+
