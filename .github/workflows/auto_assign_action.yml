@@ -4,6 +4,8 @@ name: Auto Assign Reviewers and Assignees
 on:
   pull_request:
     types: [opened]
+    branches:
+      - develop
 
 jobs:
   add-reviews:
@@ -15,12 +17,10 @@ jobs:
           addReviewers: true
           addAssignees: author
           reviewers: |
-            AyeNweTun
-            StevenYu0124
-            sweetpear0108
+            aungtuntun
             aungtuntun-9823
 
           numberOfReviewers: 0
-          numberOfAssignees: 3
+          numberOfAssignees: 1
           exclude:
             -sub-task
