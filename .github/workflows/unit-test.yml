@@ -41,6 +41,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-xml
-          files: build/reports/jacoco/test/jacocoTestReport.xml
+          path: build/reports/jacoco/test/jacocoTestReport.xml
 
 
