@@ -18,6 +18,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -31,10 +32,26 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomUserDetailService userDetailService;
 
+    private static final List<String> EXCLUDED_PATHS = List.of(
+            "/v3/api-docs",
+            "/api-docs",
+            "/v3/api-docs/*",
+            "/swagger-ui/*",
+            "/swagger-ui.html",
+            "api-docs/swagger-config",
+            "/webjars/*",
+            "/swagger-resources/**",
+            "/actuator/*"
+    );
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
+        String path = request.getRequestURI();
+        if (EXCLUDED_PATHS.stream().anyMatch(path::startsWith)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         try {
             String jwt = getJwtFromRequest(request);
             if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {

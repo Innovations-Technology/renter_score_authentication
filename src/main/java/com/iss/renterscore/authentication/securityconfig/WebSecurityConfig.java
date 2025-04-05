@@ -32,7 +32,9 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request ->
-                        request.requestMatchers("/resources/**", "/static/**", "/public/**", "/webjars/**").permitAll()
+                        request.requestMatchers("/v3/api-docs/**", "/swagger-ui/**",
+                                        "/swagger-ui.html", "/api-docs", "api-docs/swagger-config", "/actuator/**",
+                        "/resources/**", "/static/**", "/public/**", "/webjars/**").permitAll()
                         .requestMatchers("/api/v1/auth/**")
                         .permitAll()
                         .requestMatchers("/api/v1/admin/**").hasAnyAuthority("ADMIN", "MASTER")
