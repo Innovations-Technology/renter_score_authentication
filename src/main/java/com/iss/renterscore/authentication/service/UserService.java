@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -36,6 +37,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepo userRepo;
     private final RefreshTokenService refreshTokenService;
+    private final FileService fileService;
 
     @Value("${app.token.email.verification.duration}")
     public Long emailVerificationExpirationDuration;
@@ -117,33 +119,25 @@ public class UserService {
         return save(users);
     }
 
-    public Optional<ApiResponse> updateProfile(CustomUserDetails customUserDetails, UpdateRequest request, MultipartFile file) {
+    public Optional<ApiResponse> updateProfile(CustomUserDetails customUserDetails, UpdateRequest request, MultipartFile file) throws IOException {
         ApiResponse response = new ApiResponse("Profile updated successfully.", true);
 
         Users currentUsers = findByEmail(customUserDetails.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException(customUserDetails.getEmail(), "Email", "No matching user found"));
 
-        /*String fileName = "";
-        fileName = request.getProfileImage();
-        if (file != null && !file.isEmpty()) {
-            fileName = fileStorageService.storeFile(file, uploadDir);
-            logger.info("Profile file name: " + fileName);
-        }else {
-            if(fileStorageService.fileExists(currentUsers.getImageUrl(), uploadDir)) {
-                fileName = currentUsers.getImageUrl();
-            }
-        }*/
+        String profileImageUrl = fileService.saveImageFiles(customUserDetails, file, ImageType.USER);
+
         currentUsers.setPropertyRole(request.getPropertyRole());
         UserProfile profile = currentUsers.getProfile();
         profile.setFirstName(request.getFirstName());
         profile.setLastName(request.getLastName());
+        if (profileImageUrl != null && !profileImageUrl.isEmpty()) profile.setProfileImage(profileImageUrl);
         profile.setDob(convertDate(request.getDob()));
         profile.setGender(request.getGender());
         profile.setContactNumber(request.getContactNumber());
         profile.setCompany(request.getCompany());
         profile.setBiography(request.getBiography());
         profile.setAddress(request.getAddress());
-        profile.setProfileImage(request.getProfileImage());
         currentUsers.setProfile(profile);
         try {
             save(currentUsers);
