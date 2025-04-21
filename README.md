@@ -19,31 +19,21 @@ For further reference, please consider the following sections:
 * [Java Mail Sender](https://docs.spring.io/spring-boot/3.4.2/reference/io/email.html)
 * [Docker Compose Support](https://docs.spring.io/spring-boot/3.4.2/reference/features/dev-services.html#features.dev-services.docker-compose)
 
-### Guides
-The following guides illustrate how to use some features concretely:
-
-* [Building a RESTful Web Service](https://spring.io/guides/gs/rest-service/)
-* [Serving Web Content with Spring MVC](https://spring.io/guides/gs/serving-web-content/)
-* [Building REST services with Spring](https://spring.io/guides/tutorials/rest/)
-* [Handling Form Submission](https://spring.io/guides/gs/handling-form-submission/)
-* [Accessing Data with JPA](https://spring.io/guides/gs/accessing-data-jpa/)
-* [Accessing Relational Data using JDBC with Spring](https://spring.io/guides/gs/relational-data-access/)
-* [Managing Transactions](https://spring.io/guides/gs/managing-transactions/)
-* [Validation](https://spring.io/guides/gs/validating-form-input/)
-* [Securing a Web Application](https://spring.io/guides/gs/securing-web/)
-* [Spring Boot and OAuth2](https://spring.io/guides/tutorials/spring-boot-oauth2/)
-* [Authenticating a User with LDAP](https://spring.io/guides/gs/authenticating-ldap/)
-
 ### Additional Links
 These additional references should also help you:
 
 * [Gradle Build Scans – insights for your project's build](https://scans.gradle.com#gradle)
 
-### Docker Compose support (Temporary Disabled)
-This project contains a Docker Compose file named `compose.yaml`.
+### API Docs
+Here is Open API Docs should also help you:
+
+* [http://server:port/context-path/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
+
+### Docker Compose support 
+This project contains a Docker and Docker Compose file named `Dockerfile` and `docker-publish.yaml`.
 In this file, the following services have been defined:
 
-* sqlserver: [`mcr.microsoft.com/mssql/server:latest`](https://mcr.microsoft.com/en-us/product/mssql/server/about/)
+* api: [`docker boot:run`]()
 
 Please review the tags of the used images and set them to the same as you're running in production.
 

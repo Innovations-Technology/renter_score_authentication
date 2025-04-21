@@ -15,12 +15,10 @@ jobs:
           addReviewers: true
           addAssignees: author
           reviewers: |
-            AyeNweTun
-            StevenYu0124
-            sweetpear0108
+            aungtuntun
             aungtuntun-9823
 
           numberOfReviewers: 0
-          numberOfAssignees: 3
-          exclude:
-            -sub-task
+          numberOfAssignees: 1
+        #  exclude:
+        #    - sub-task
