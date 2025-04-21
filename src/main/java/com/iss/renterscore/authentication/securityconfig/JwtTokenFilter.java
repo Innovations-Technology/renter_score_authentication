@@ -35,13 +35,13 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private static final List<String> EXCLUDED_PATHS = List.of(
             "/v3/api-docs",
             "/api-docs",
-            "/v3/api-docs/*",
-            "/swagger-ui/*",
+            "/swagger-ui",
             "/swagger-ui.html",
             "api-docs/swagger-config",
-            "/webjars/*",
-            "/swagger-resources/**",
-            "/actuator/*"
+            "/webjars",
+            "/swagger-resources",
+            "/actuator",
+            "/images/"
     );
 
     @Override
