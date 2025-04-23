@@ -12,7 +12,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter @Setter
-public class Mail implements Serializable {
+public class Mails implements Serializable {
 
 	private String from;
 	private String fromName;
