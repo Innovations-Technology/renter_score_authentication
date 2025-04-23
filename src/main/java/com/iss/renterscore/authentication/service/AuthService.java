@@ -39,9 +39,9 @@ public class AuthService {
         Users newUser = userService.createUser(request);
         UserProfile profile = userService.createUserProfile(request);
         newUser.setProfile(profile);
-        Users registeredUser = userService.save(newUser);
+     //   Users registeredUser = userService.save(newUser);
 
-        return Optional.ofNullable(registeredUser);
+        return Optional.ofNullable(newUser);
     }
 
     public Boolean emailAlreadyExist(String email) {
