@@ -5,7 +5,6 @@ import com.iss.renterscore.authentication.exceptions.MailSendException;
 import com.iss.renterscore.authentication.model.Users;
 import com.iss.renterscore.authentication.service.MailService;
 import freemarker.template.TemplateException;
-import jakarta.mail.MessagingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +41,7 @@ public class OnUserAccountChangeListener implements ApplicationListener<OnUserAc
 		String baseUrl = event.getBaseUrl();
 		try {
 			mailService.sendAccountChangeEmail(action, actionStatus, recipientAddress, users.getProfile().getFirstName(), baseUrl);
-		} catch (IOException | TemplateException | MessagingException e) {
+		} catch (IOException | TemplateException e) {
 			logger.error(e.getMessage());
 			throw new MailSendException(recipientAddress, "Account Change Mail");
 		}
