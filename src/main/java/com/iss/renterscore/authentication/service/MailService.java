@@ -1,24 +1,27 @@
 package com.iss.renterscore.authentication.service;
 
-import com.iss.renterscore.authentication.model.Mail;
+import com.iss.renterscore.authentication.model.Mails;
 import com.iss.renterscore.authentication.utils.Utils;
+import com.sendgrid.Method;
+import com.sendgrid.Request;
+import com.sendgrid.Response;
+import com.sendgrid.SendGrid;
+import com.sendgrid.helpers.mail.Mail;
+import com.sendgrid.helpers.mail.objects.Content;
+import com.sendgrid.helpers.mail.objects.Email;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 import static com.iss.renterscore.authentication.utils.Utils.*;
@@ -27,7 +30,8 @@ import static com.iss.renterscore.authentication.utils.Utils.*;
 @RequiredArgsConstructor
 public class MailService {
 
-	private JavaMailSender mailSender;
+	private static final Logger logger = LoggerFactory.getLogger(MailService.class);
+
 	private Configuration templateConfiguration;
 	
 	@Value("${app.templates.location}")
@@ -41,17 +45,19 @@ public class MailService {
 	
 	@Value("${app.token.password.reset.duration}")
 	private Long expiration;
+
+	@Value("#{systemEnvironment['SENDGRID_API_KEY']}")
+	private String sendGridApiKey;
 	
 	@Autowired
-	public MailService(JavaMailSender mailSender, Configuration templateConfiguration) {
-		this.mailSender = mailSender;
+	public MailService(Configuration templateConfiguration) {
 		this.templateConfiguration = templateConfiguration;
 	}
 
 	/*	User Registration complete Action  */
-	public void sendEmailVerification(String emailVerificationUrl, String to, String toName, String baseUrl, String token) throws IOException, TemplateException, MessagingException {
+	public void sendEmailVerification(String emailVerificationUrl, String to, String toName, String baseUrl, String token) throws IOException, TemplateException {
 		
-		Mail mail = new Mail();
+		Mails mail = new Mails();
 		mail.setSubject(EMAIL_VERIFICATION);
 		mail.setTo(to);
 		mail.setFrom(mailFrom);
@@ -67,10 +73,10 @@ public class MailService {
 		send(mail);
 	}
 	
-	public void sendResetLink(String resetPasswordLink, String to, String toName, String baseUrl) throws IOException, TemplateException, MessagingException {
+	public void sendResetLink(String resetPasswordLink, String to, String toName, String baseUrl) throws IOException, TemplateException {
 		long expirationInMinutes = TimeUnit.MILLISECONDS.toMinutes(expiration);
 		String expirationInMinutesString = Long.toString(expirationInMinutes);
-		Mail mail = new Mail();
+		Mails mail = new Mails();
 		mail.setSubject(PASSWORD_RESET_LINK);
 		mail.setTo(to);
 		mail.setFrom(mailFrom);
@@ -87,8 +93,8 @@ public class MailService {
 		send(mail);
 	}
 	
-	public void sendAccountChangeEmail(String action, String actionStatus, String to, String toName, String baseUrl) throws IOException, TemplateException, MessagingException {
-		Mail mail = new Mail();
+	public void sendAccountChangeEmail(String action, String actionStatus, String to, String toName, String baseUrl) throws IOException, TemplateException {
+		Mails mail = new Mails();
 		mail.setSubject(ACCOUNT_STATUS);
 		mail.setTo(to);
 		mail.setFrom(mailFrom);
@@ -104,21 +110,31 @@ public class MailService {
 		send(mail);
 	}
 
-	public void send(Mail mail) throws MessagingException, UnsupportedEncodingException {
-		MimeMessage message = mailSender.createMimeMessage();
-		MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
-				StandardCharsets.UTF_8.name());
-		if (mail.getTo().contains(",")) {
-			helper.setTo(mail.getTo().split(","));
-		}else {
-			helper.setTo(mail.getTo());
+	public void send(Mails mail) {
+		checkEnv();
+		Email from = new Email(mailFrom, mailFromName);
+		Email to = new Email(mail.getTo());
+		Content content = new Content("text/html", mail.getContent());
+		Mail sendGridMail = new Mail(from, mail.getSubject(), to, content);
+		SendGrid sendGrid = new SendGrid(sendGridApiKey);
+		Request request = new Request();
+		try {
+			request.setMethod(Method.POST);
+			request.setEndpoint("mail/send");
+			request.setBody(sendGridMail.build());
+			Response response = sendGrid.api(request);
+			logger.info("SendGrid Response: status={}, body={}, headers={}",
+					response.getStatusCode(), response.getBody(), response.getHeaders());
+		} catch (IOException e) {
+			logger.error("Failed to send email with SendGrid", e);
+			throw new RuntimeException("Email sending failed", e);
+
 		}
-		
-		helper.setText(mail.getContent(), true);
-		helper.setSubject(mail.getSubject());
-		helper.setPriority(1);
-		helper.setFrom(new InternetAddress(mailFrom, mailFromName));
-		mailSender.send(message);
+
 	}
 
+	@PostConstruct
+	public void checkEnv() {
+		logger.info("Spring ENV: ");
+	}
 }

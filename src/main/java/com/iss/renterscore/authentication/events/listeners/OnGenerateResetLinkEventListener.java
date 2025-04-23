@@ -6,7 +6,6 @@ import com.iss.renterscore.authentication.model.PasswordResetToken;
 import com.iss.renterscore.authentication.model.Users;
 import com.iss.renterscore.authentication.service.MailService;
 import freemarker.template.TemplateException;
-import jakarta.mail.MessagingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +42,7 @@ public class OnGenerateResetLinkEventListener implements ApplicationListener<OnG
 		String emailConfirmationUrl = event.getRedirectUrl().queryParam("token", passwordResetToken.getToken()).toUriString();
 		try {
 			mailService.sendResetLink(emailConfirmationUrl, recipientAddress, user.getProfile().getFirstName(), baseUrl);
-		} catch (IOException | TemplateException | MessagingException e) {
+		} catch (IOException | TemplateException e) {
 			logger.error(e.getMessage());
 			throw new MailSendException(recipientAddress, "Email Verification");
 		}

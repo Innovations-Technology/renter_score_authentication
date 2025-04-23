@@ -5,7 +5,6 @@ import com.iss.renterscore.authentication.exceptions.UpdatePasswordException;
 import com.iss.renterscore.authentication.model.CustomUserDetails;
 import com.iss.renterscore.authentication.model.Property;
 import com.iss.renterscore.authentication.model.PropertyDto;
-import com.iss.renterscore.authentication.model.PropertyImage;
 import com.iss.renterscore.authentication.payloads.ApiResponse;
 import com.iss.renterscore.authentication.payloads.PropertyRequest;
 import com.iss.renterscore.authentication.payloads.UpdateRequest;
@@ -19,7 +18,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.util.List;
@@ -62,24 +60,6 @@ public class PropertyController {
                 .orElseThrow(() -> new ResourceNotFoundException("Property with user ", currentUser.getEmail(), "Not found!"));
 
         return ResponseEntity.ok(properties.stream().map(PropertyDto::new).toList());
-
-    }
-
-    private void setImageContextPath(Property property) {
-
-        if (property.getHeroImage() != null && !property.getHeroImage().isEmpty()) {
-            String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("/" + property.getHeroImage()).toUriString();
-            property.setHeroImage(imageUrl);
-        }
-
-        for (PropertyImage propertyImage : property.getImages()) {
-            if (propertyImage.getImage() != null && !propertyImage.getImage().isEmpty()) {
-                String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                        .path("/" + propertyImage.getImage()).toUriString();
-                propertyImage.setImage(imageUrl);
-            }
-        }
 
     }
 
