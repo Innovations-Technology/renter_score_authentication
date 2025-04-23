@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Auto Assign
-        uses: kentaro-m/auto-assign-action@V2.0.0
+        uses: kentaro-m/auto-assign-action@V2
         with:
           addReviewers: true
           addAssignees: author
