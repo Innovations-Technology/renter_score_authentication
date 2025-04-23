@@ -13,22 +13,15 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import jakarta.annotation.PostConstruct;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 import static com.iss.renterscore.authentication.utils.Utils.*;
@@ -39,7 +32,6 @@ public class MailService {
 
 	private static final Logger logger = LoggerFactory.getLogger(MailService.class);
 
-	private JavaMailSender mailSender;
 	private Configuration templateConfiguration;
 	
 	@Value("${app.templates.location}")
@@ -58,13 +50,12 @@ public class MailService {
 	private String sendGridApiKey;
 	
 	@Autowired
-	public MailService(JavaMailSender mailSender, Configuration templateConfiguration) {
-		this.mailSender = mailSender;
+	public MailService(Configuration templateConfiguration) {
 		this.templateConfiguration = templateConfiguration;
 	}
 
 	/*	User Registration complete Action  */
-	public void sendEmailVerification(String emailVerificationUrl, String to, String toName, String baseUrl, String token) throws IOException, TemplateException, MessagingException {
+	public void sendEmailVerification(String emailVerificationUrl, String to, String toName, String baseUrl, String token) throws IOException, TemplateException {
 		
 		Mails mail = new Mails();
 		mail.setSubject(EMAIL_VERIFICATION);
@@ -82,7 +73,7 @@ public class MailService {
 		send(mail);
 	}
 	
-	public void sendResetLink(String resetPasswordLink, String to, String toName, String baseUrl) throws IOException, TemplateException, MessagingException {
+	public void sendResetLink(String resetPasswordLink, String to, String toName, String baseUrl) throws IOException, TemplateException {
 		long expirationInMinutes = TimeUnit.MILLISECONDS.toMinutes(expiration);
 		String expirationInMinutesString = Long.toString(expirationInMinutes);
 		Mails mail = new Mails();
@@ -102,7 +93,7 @@ public class MailService {
 		send(mail);
 	}
 	
-	public void sendAccountChangeEmail(String action, String actionStatus, String to, String toName, String baseUrl) throws IOException, TemplateException, MessagingException {
+	public void sendAccountChangeEmail(String action, String actionStatus, String to, String toName, String baseUrl) throws IOException, TemplateException {
 		Mails mail = new Mails();
 		mail.setSubject(ACCOUNT_STATUS);
 		mail.setTo(to);
@@ -119,22 +110,7 @@ public class MailService {
 		send(mail);
 	}
 
-	public void send(Mails mail) throws MessagingException, UnsupportedEncodingException {
-		/*MimeMessage message = mailSender.createMimeMessage();
-		MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
-				StandardCharsets.UTF_8.name());
-		if (mail.getTo().contains(",")) {
-			helper.setTo(mail.getTo().split(","));
-		}else {
-			helper.setTo(mail.getTo());
-		}
-		
-		helper.setText(mail.getContent(), true);
-		helper.setSubject(mail.getSubject());
-		helper.setPriority(1);
-		helper.setFrom(new InternetAddress(mailFrom, mailFromName));
-		mailSender.send(message);*/
-		logger.info("API KEY " + sendGridApiKey);
+	public void send(Mails mail) {
 		checkEnv();
 		Email from = new Email(mailFrom, mailFromName);
 		Email to = new Email(mail.getTo());
@@ -159,6 +135,6 @@ public class MailService {
 
 	@PostConstruct
 	public void checkEnv() {
-		logger.info("Spring ENV: " + System.getenv("SENDGRID_API_KEY"));
+		logger.info("Spring ENV: ");
 	}
 }
