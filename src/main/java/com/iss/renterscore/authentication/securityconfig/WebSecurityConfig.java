@@ -42,7 +42,8 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         // CSRF protection is disabled because this is a stateless REST API using JWT
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request ->
-                        request.requestMatchers("/images/**", "/v3/api-docs/**", "/swagger-ui/**",
+                        request.requestMatchers("/images/**").permitAll()
+                                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**",
                                         "/swagger-ui.html", "/api-docs", "/api-docs/swagger-config", "/actuator/**",
                                         "/resources/**", "/static/**", "/public/**", "/webjars/**").permitAll()
                                 .requestMatchers("/api/v1/auth/**").permitAll()

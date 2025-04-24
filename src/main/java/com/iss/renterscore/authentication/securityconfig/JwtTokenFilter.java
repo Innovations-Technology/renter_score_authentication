@@ -41,7 +41,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             "/webjars",
             "/swagger-resources",
             "/actuator",
-            "/images/"
+            "/images"
     );
 
     @Override
