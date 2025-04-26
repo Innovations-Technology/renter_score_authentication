@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -33,22 +34,26 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private final CustomUserDetailService userDetailService;
 
     private static final List<String> EXCLUDED_PATHS = List.of(
-            "/v3/api-docs",
-            "/api-docs",
-            "/swagger-ui",
+            "/v3/api-docs/**",
+            "/api-docs/**",
+            "/swagger-ui/**",
             "/swagger-ui.html",
             "api-docs/swagger-config",
-            "/webjars",
-            "/swagger-resources",
-            "/actuator",
-            "/images/"
+            "/webjars/**",
+            "/swagger-resources/**",
+            "/actuator/**",
+            "/images/**"
     );
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
         String path = request.getRequestURI();
-        if (EXCLUDED_PATHS.stream().anyMatch(path::startsWith)) {
+        logger.info("Image directory path:", path);
+
+        boolean isExcluded = EXCLUDED_PATHS.stream().anyMatch(pattern -> pathMatcher.match(pattern, path));
+        if (isExcluded) {
             filterChain.doFilter(request, response);
             return;
         }
