@@ -9,7 +9,6 @@ import com.iss.renterscore.authentication.repos.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,6 +38,10 @@ public class PropertyService {
         return Optional.of(propertyRepo.findAllByUser(user));
     }
 
+    public Optional<Property> getPropertyDetails(Long propertyId) {
+        return propertyRepo.findById(propertyId);
+    }
+
     public synchronized Optional<ApiResponse> createProperty(CustomUserDetails userDetails, PropertyRequest request, List<MultipartFile> files) throws IOException {
         ApiResponse response = new ApiResponse("Property created successfully.", true);
 
@@ -47,26 +50,13 @@ public class PropertyService {
         }
         Property property = new Property();
         Users user = userRepo.existsByEmail(userDetails.getUsername());
-        if (!files.isEmpty()) {
+        if (files != null && !files.isEmpty()) {
             String heroImageUrl = fileService.saveImageFiles(userDetails, files.get(0), ImageType.HEROES);
             property.setHeroImage(heroImageUrl);
             List<PropertyImage> savedImages = savedDetailImages(userDetails, property, files);
             property.getImages().addAll(savedImages);
         }
-        property.setTitle(request.getTitle());
-        property.setDescription(request.getDescription());
-        property.setAmenities(request.getAmenities());
-        property.setBedrooms(request.getBedrooms());
-        property.setBathrooms(request.getBathrooms());
-        property.setAvailableDate(request.getAvailableDate());
-        property.setPropertyStatus(request.getPropertyStatus());
-        property.setPrice(request.getPrice());
-        property.setCurrency("SGD");
-        property.setSize(request.getSize());
-        property.setRentType(request.getRentType());
-        property.setPropertyType(request.getPropertyType());
-        Address address = new Address(request.getBlockNo(), request.getUnitNo(), request.getStreet(), request.getPostalCode(), request.getRegions());
-        property.setAddress(address);
+        updateObject(request, property);
 
         property.setUser(user);
 
@@ -102,15 +92,58 @@ public class PropertyService {
         Property property = propertyRepo.findByAddress_UnitNoAndAddress_BlockNoAndAddress_PostalCode(unitNo, blockNo, postalCode);
         return property != null;
     }
-    public synchronized Optional<Property> updateProperty(UserDetails userDetails, Long id, PropertyRequest request) {
-        Property property = propertyRepo.getReferenceById(id);
 
-        property.setPropertyStatus(request.getPropertyStatus());
-        property.setPropertyType(request.getPropertyType());
-        return Optional.of(propertyRepo.save(property));
+    public synchronized Optional<ApiResponse> updateProperty(CustomUserDetails userDetails, Long propertyId, PropertyRequest request, List<MultipartFile> files) throws IOException {
+
+        ApiResponse response = new ApiResponse("Property updated successfully.", true);
+        Property property = propertyRepo.getReferenceById(propertyId);
+
+        if (files != null && !files.isEmpty()) {
+            String heroImageUrl = fileService.saveImageFiles(userDetails, files.get(0), ImageType.HEROES);
+            property.setHeroImage(heroImageUrl);
+            List<PropertyImage> savedImages = savedDetailImages(userDetails, property, files);
+            property.getImages().addAll(savedImages);
+        }
+
+        updateObject(request, property);
+        try {
+            propertyRepo.save(property);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            response = new ApiResponse("Update property failed with "+ e.getMessage(), false);
+        }
+        return Optional.of(response);
     }
 
+    public void updateObject(PropertyRequest request, Property property) {
+        property.setTitle(request.getTitle());
+        property.setDescription(request.getDescription());
+        property.setAmenities(request.getAmenities());
+        property.setBedrooms(request.getBedrooms());
+        property.setBathrooms(request.getBathrooms());
+        property.setAvailableDate(request.getAvailableDate());
+        property.setPropertyStatus(request.getPropertyStatus());
+        property.setPrice(request.getPrice());
+        property.setCurrency("SGD");
+        property.setSize(request.getSize());
+        property.setRentType(request.getRentType());
+        property.setPropertyType(request.getPropertyType());
+        Address address = new Address(request.getBlockNo(), request.getUnitNo(), request.getStreet(), request.getPostalCode(), request.getRegions());
+        property.setAddress(address);
+    }
 
+    public synchronized Optional<ApiResponse> deleteProperty(CustomUserDetails userDetails, Long propertyId) {
 
+        ApiResponse response = new ApiResponse("Property deleted successfully.", true);
+        Property property = propertyRepo.getReferenceById(propertyId);
+
+        try {
+            propertyRepo.deleteById(propertyId);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            response = new ApiResponse("Delete property failed with "+ e.getMessage(), false);
+        }
+        return Optional.of(response);
+    }
 
 }

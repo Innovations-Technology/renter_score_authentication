@@ -76,7 +76,7 @@ public class UserService {
     public UserProfile createUserProfile(RegistrationRequest registrationRequest) {
         UserProfile profile = new UserProfile();
         profile.setEmail(registrationRequest.getEmail());
-        profile.setPropertyRole(PropertyRole.ROLE_TENANT);
+        profile.setPropertyRole(registrationRequest.getRole());
         profile.setFirstName(registrationRequest.getFirstName());
         profile.setLastName(registrationRequest.getLastName());
         profile.setGender(Gender.OTHER);
