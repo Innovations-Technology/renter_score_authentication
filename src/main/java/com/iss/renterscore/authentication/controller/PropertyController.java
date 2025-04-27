@@ -1,9 +1,6 @@
 package com.iss.renterscore.authentication.controller;
 
-import com.iss.renterscore.authentication.exceptions.AppException;
-import com.iss.renterscore.authentication.exceptions.DataAlreadyExistException;
-import com.iss.renterscore.authentication.exceptions.ResourceAlreadyInUseException;
-import com.iss.renterscore.authentication.exceptions.ResourceNotFoundException;
+import com.iss.renterscore.authentication.exceptions.*;
 import com.iss.renterscore.authentication.model.CustomUserDetails;
 import com.iss.renterscore.authentication.model.Property;
 import com.iss.renterscore.authentication.model.PropertyDto;
@@ -16,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -48,9 +46,17 @@ public class PropertyController {
         return ResponseEntity.ok(properties.stream().map(PropertyDto::new).toList());
     }
 
+    @GetMapping("/property-details/{id}")
+    public ResponseEntity<?> getPropertyDetails(@PathVariable("id") Long propertyId) {
+        Property properties = propertyService.getPropertyDetails(propertyId)
+                .orElseThrow(() -> new ResourceNotFoundException("Property with id ", propertyId + "", "Not found!"));
+
+        return ResponseEntity.ok(new PropertyDto(properties));
+    }
+
     @GetMapping("/details/{id}")
     public ResponseEntity<?> getPropertyDetails(@CurrentUser CustomUserDetails currentUser, @PathVariable("id") Long propertyId) {
-        if (currentUser == null) return ResponseEntity.ok(null);
+        if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
 
         Property properties = propertyService.getPropertyDetails(propertyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Property with id ", propertyId + "", "Not found!"));
