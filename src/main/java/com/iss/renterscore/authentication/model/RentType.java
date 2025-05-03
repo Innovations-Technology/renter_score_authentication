@@ -6,9 +6,9 @@ import lombok.Getter;
 public enum RentType {
     MONTHLY ("Monthly"), YEARLY ("Yearly");
 
-    public final String name;
+    public final String value;
 
     RentType(String name) {
-        this.name = name;
+        this.value = name;
     }
 }

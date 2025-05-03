@@ -6,10 +6,10 @@ import lombok.Getter;
 public enum PropertyRole {
         ROLE_TENANT("TENANT"), ROLE_AGENT("AGENT"), ROLE_LANDLORD("LANDLORD");
 
-        public final String name;
+        public final String value;
 
         PropertyRole(String tenant) {
-                this.name = tenant;
+                this.value = tenant;
         }
 
 }
