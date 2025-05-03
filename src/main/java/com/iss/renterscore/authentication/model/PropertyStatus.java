@@ -6,10 +6,10 @@ import lombok.Getter;
 public enum PropertyStatus {
     PARTIALLY_FINISHED ("Partially Finished"), FULLY_FINISHED ("Fully Finished");
 
-    public final String name;
+    public final String value;
 
 
     PropertyStatus(String name) {
-        this.name = name;
+        this.value = name;
     }
 }

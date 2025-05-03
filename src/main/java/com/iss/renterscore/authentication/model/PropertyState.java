@@ -4,9 +4,9 @@ public enum PropertyState {
 
     AVAILABLE("Available"), OCCUPIED("Occupied"), SUSPENDED("Suspended");
 
-    public final String name;
+    public final String value;
 
     PropertyState(String name) {
-        this.name = name;
+        this.value = name;
     }
 }
