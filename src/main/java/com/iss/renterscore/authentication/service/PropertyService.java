@@ -51,8 +51,11 @@ public class PropertyService {
         Property property = new Property();
         Users user = userRepo.existsByEmail(userDetails.getUsername());
         if (files != null && !files.isEmpty()) {
-            String heroImageUrl = fileService.saveImageFiles(userDetails, files.get(0), ImageType.HEROES);
-            property.setHeroImage(heroImageUrl);
+            if (Boolean.TRUE.equals(request.getIsHeroImageChanged())) {
+                String heroImageUrl = fileService.saveImageFiles(userDetails, files.get(0), ImageType.HEROES);
+                property.setHeroImage(heroImageUrl);
+                files.remove(0);
+            }
             List<PropertyImage> savedImages = savedDetailImages(userDetails, property, files);
             property.getImages().addAll(savedImages);
         }
@@ -71,10 +74,9 @@ public class PropertyService {
 
     private List<PropertyImage> savedDetailImages(CustomUserDetails userDetails, Property property, List<MultipartFile> images) throws IOException {
         List<PropertyImage> savedImages = new ArrayList<>();
-        if (images.isEmpty() || images.size() <= 1) return savedImages;
+        if (images.isEmpty()) return savedImages;
 
-        List<MultipartFile> detailImages = images.subList(1, images.size());
-        for (MultipartFile file: detailImages) {
+        for (MultipartFile file: images) {
             if (file.isEmpty()) continue;
 
             String imageUrl = fileService.saveImageFiles(userDetails, file, ImageType.DETAILS);
@@ -125,6 +127,7 @@ public class PropertyService {
         property.setPropertyStatus(request.getPropertyStatus());
         property.setPrice(request.getPrice());
         property.setCurrency("SGD");
+        property.setPropertyState(request.getPropertyState());
         property.setSize(request.getSize());
         property.setRentType(request.getRentType());
         property.setPropertyType(request.getPropertyType());
@@ -132,11 +135,9 @@ public class PropertyService {
         property.setAddress(address);
     }
 
-    public synchronized Optional<ApiResponse> deleteProperty(CustomUserDetails userDetails, Long propertyId) {
+    public synchronized Optional<ApiResponse> deleteProperty(Long propertyId) {
 
         ApiResponse response = new ApiResponse("Property deleted successfully.", true);
-        Property property = propertyRepo.getReferenceById(propertyId);
-
         try {
             propertyRepo.deleteById(propertyId);
         } catch (Exception e) {
