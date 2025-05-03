@@ -43,6 +43,8 @@ public record PropertyDto(
         RentType rentType,
         @JsonProperty(value = "user")
         UserDto user,
+        @JsonProperty(value = "property_state")
+        PropertyState propertyState,
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "UTC")
         @JsonProperty(value = "created_date")
         LocalDateTime createdDate,
@@ -77,6 +79,7 @@ public record PropertyDto(
                 property.getSize(),
                 property.getRentType(),
                 new UserDto(property.getUser()),
+                property.getPropertyState(),
                 property.getCreatedDate(),
                 property.getModifiedDate(),
                 property.getCreatedUser(),

@@ -1,10 +1,7 @@
 package com.iss.renterscore.authentication.payloads;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.iss.renterscore.authentication.model.PropertyStatus;
-import com.iss.renterscore.authentication.model.PropertyType;
-import com.iss.renterscore.authentication.model.Regions;
-import com.iss.renterscore.authentication.model.RentType;
+import com.iss.renterscore.authentication.model.*;
 import lombok.*;
 
 @Data
@@ -45,4 +42,8 @@ public class PropertyRequest {
     String size;
     @JsonProperty("rent_type")
     RentType rentType;
+    @JsonProperty("property_state")
+    PropertyState propertyState;
+    @JsonProperty("is_hero_image_changed")
+    Boolean isHeroImageChanged;
 }
