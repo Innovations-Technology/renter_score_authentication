@@ -6,9 +6,9 @@ import lombok.Getter;
 public enum PropertyType {
     CONDO("Condo"), EXECUTIVE_CONDO("Executive Condo"), HDB("HDB"), LANDED("Landed");
 
-    public final String name;
+    public final String value;
 
     PropertyType(String name) {
-        this.name = name;
+        this.value = name;
     }
 }
