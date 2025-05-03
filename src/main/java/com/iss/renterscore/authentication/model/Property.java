@@ -1,7 +1,6 @@
 package com.iss.renterscore.authentication.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
@@ -82,4 +81,8 @@ public class Property extends BaseModel {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private Users user;
+    @Column(name = "property_state", nullable = false)
+    @Enumerated(EnumType.STRING)
+    PropertyState propertyState;
+
 }

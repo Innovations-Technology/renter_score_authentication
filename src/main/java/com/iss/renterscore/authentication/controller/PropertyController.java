@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -46,7 +45,7 @@ public class PropertyController {
         return ResponseEntity.ok(properties.stream().map(PropertyDto::new).toList());
     }
 
-    @GetMapping("/property-details/{id}")
+    @GetMapping("/detail/{id}")
     public ResponseEntity<?> getPropertyDetails(@PathVariable("id") Long propertyId) {
         Property properties = propertyService.getPropertyDetails(propertyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Property with id ", propertyId + "", "Not found!"));
@@ -66,7 +65,7 @@ public class PropertyController {
 
     @GetMapping("/created-properties")
     public ResponseEntity<?> getAllProperties(@CurrentUser CustomUserDetails currentUser) {
-        if (currentUser == null) return ResponseEntity.ok(null);
+        if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
 
         List<Property> properties = propertyService.getAllProperties(currentUser)
                 .orElseThrow(() -> new ResourceNotFoundException("Property with user ", currentUser.getEmail(), "Not found!"));
@@ -77,6 +76,7 @@ public class PropertyController {
 
     @PostMapping("/create-property")
     public ResponseEntity<?> createProperty(@CurrentUser CustomUserDetails currentUser, @RequestPart("property") PropertyRequest request, @RequestPart(value = "file", required = false) List<MultipartFile> files) {
+        if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
         ApiResponse response;
         try {
             response = propertyService.createProperty(currentUser, request, files)
@@ -89,6 +89,7 @@ public class PropertyController {
 
     @PostMapping("/update-property")
     public ResponseEntity<?> updateProperty(@CurrentUser CustomUserDetails currentUser,  @RequestPart("id") Long propertyId, @RequestPart("property") PropertyRequest request, @RequestPart(value = "file", required = false) List<MultipartFile> files) {
+        if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
         ApiResponse response;
         try {
             response = propertyService.updateProperty(currentUser, propertyId, request, files)
@@ -102,7 +103,9 @@ public class PropertyController {
 
     @PostMapping("/delete-property/{id}")
     public ResponseEntity<?> deleteProperty(@CurrentUser CustomUserDetails currentUser, @PathVariable("id") Long propertyId) {
-        ApiResponse response = propertyService.deleteProperty(currentUser, propertyId)
+        if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
+
+        ApiResponse response = propertyService.deleteProperty(propertyId)
                 .orElseThrow(() -> new ResourceAlreadyInUseException("Property with id" + propertyId, "Property is being used!", ""));
         return ResponseEntity.ok(response);
     }
