@@ -186,4 +186,11 @@ public class AuthControllerAdvice {
     public ApiResponse handleUnauthorizedException(UnauthorizedException ex, WebRequest request) {
         return new ApiResponse(ex.getMessage(), false, ex.getClass().getSimpleName(), resolvePathFromWebRequest(request));
     }
+
+    @ExceptionHandler(value = CreationException.class)
+    @ResponseStatus(HttpStatus.EXPECTATION_FAILED)
+    @ResponseBody
+    public ApiResponse handleCreationException(CreationException ex, WebRequest request) {
+        return new ApiResponse(ex.getMessage(), false, ex.getClass().getSimpleName(), resolvePathFromWebRequest(request));
+    }
 }

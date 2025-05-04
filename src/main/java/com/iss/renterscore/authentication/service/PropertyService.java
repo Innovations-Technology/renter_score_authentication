@@ -1,5 +1,7 @@
 package com.iss.renterscore.authentication.service;
 
+import com.iss.renterscore.authentication.exceptions.AppException;
+import com.iss.renterscore.authentication.exceptions.CreationException;
 import com.iss.renterscore.authentication.exceptions.ResourceAlreadyInUseException;
 import com.iss.renterscore.authentication.model.*;
 import com.iss.renterscore.authentication.payloads.ApiResponse;
@@ -67,7 +69,7 @@ public class PropertyService {
             propertyRepo.save(property);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            response = new ApiResponse("Create property failed with "+ e.getMessage(), false);
+            throw new CreationException("Property" + property.getTitle(), e.getMessage());
         }
         return Optional.of(response);
     }
