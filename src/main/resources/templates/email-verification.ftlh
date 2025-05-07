@@ -69,7 +69,7 @@
 						<p class="" style="margin: 20px 0; font-size: 16px; mso-line-height-rule: exactly; line-height: 24px;">
 							Contact our support team if you have any questions or concerns.&nbsp;<a
 								style="color: #316fea; text-decoration: none;"
-								href="web-page-link" target="_blank" rel="noopener">Ask us any
+								href="https://www.renterscore.live" target="_blank" rel="noopener">Ask us any
 							question</a></p>
 						<p class="tw-signoff"
 						   style="margin: 45px 0 5px; font-size: 16px; mso-line-height-rule: exactly; line-height: 24px;">

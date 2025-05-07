@@ -45,7 +45,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                         request.requestMatchers("/images/**").permitAll()
                                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**",
                                         "/swagger-ui.html", "/api-docs", "/api-docs/swagger-config", "/actuator/**",
-                                        "/resources/**", "/static/**", "/public/**", "/webjars/**").permitAll()
+                                        "/resources/**", "/static/**", "/ico.webp", "/public/**", "/webjars/**").permitAll()
                                 .requestMatchers("/api/v1/auth/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/property/**").permitAll()
                                 .requestMatchers("/api/v1/admin/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN", "ROLE_MASTER")
