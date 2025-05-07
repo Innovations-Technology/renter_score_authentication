@@ -27,7 +27,7 @@ These additional references should also help you:
 ### API Docs
 Here is Open API Docs should also help you:
 
-* [http://server:port/context-path/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
+* [http://server:port/context-path/swagger-ui/index.html](https://renterscore.live/swagger-ui/index.html)
 
 ### Docker Compose support 
 This project contains a Docker and Docker Compose file named `Dockerfile` and `docker-publish.yaml`.

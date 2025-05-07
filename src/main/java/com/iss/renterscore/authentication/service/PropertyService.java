@@ -1,11 +1,11 @@
 package com.iss.renterscore.authentication.service;
 
-import com.iss.renterscore.authentication.exceptions.AppException;
 import com.iss.renterscore.authentication.exceptions.CreationException;
 import com.iss.renterscore.authentication.exceptions.ResourceAlreadyInUseException;
 import com.iss.renterscore.authentication.model.*;
 import com.iss.renterscore.authentication.payloads.ApiResponse;
 import com.iss.renterscore.authentication.payloads.PropertyRequest;
+import com.iss.renterscore.authentication.repos.BookmarkRepo;
 import com.iss.renterscore.authentication.repos.PropertyRepo;
 import com.iss.renterscore.authentication.repos.UserRepo;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,19 +30,61 @@ public class PropertyService {
     private final PropertyRepo propertyRepo;
     private final UserRepo userRepo;
     private final FileService fileService;
+    private final BookmarkRepo bookmarkRepo;
 
-
-
-    public Optional<List<Property>> getAllProperties() {
-        return Optional.of(propertyRepo.findAll());
+    // get all properties with bookmark status
+    public List<PropertyDto> getAllProperties(CustomUserDetails userDetails) {
+        List<PropertyDto> propertyDtos;
+        List<Property> properties = propertyRepo.findAllOrderByModifiedDate();
+        Users users = userRepo.existsByEmail(userDetails.getUsername());
+        if (users != null) {
+            Set<Long> bookmarkedIds = bookmarkRepo.findAllByUser(users)
+                    .stream()
+                    .map(bookmark -> bookmark.getProperty().getId())
+                    .collect(Collectors.toSet());
+            propertyDtos = properties.stream()
+                    .map( property -> new PropertyDto(property, bookmarkedIds.contains(property.getId()))
+                    ).toList();
+        } else {
+            propertyDtos = properties.stream().map(p -> new PropertyDto(p, false)).toList();
+        }
+        return propertyDtos;
     }
 
-    public Optional<List<Property>> getAllProperties(CustomUserDetails userDetails) {
+    // get all created properties
+    public Optional<List<PropertyDto>> getAllCreatedProperties(CustomUserDetails userDetails) {
         Users user = userRepo.existsByEmail(userDetails.getUsername());
-        return Optional.of(propertyRepo.findAllByUser(user));
+
+        List<Property> properties = propertyRepo.findAllByUser(user);
+        return Optional.of(properties.stream().map(p -> new PropertyDto(p, false)).toList());
     }
 
-    public Optional<Property> getPropertyDetails(Long propertyId) {
+    // bookmark items
+    public Optional<List<PropertyDto>> getAllBookmarkedProperties(CustomUserDetails userDetails) {
+        Users users = userRepo.existsByEmail(userDetails.getUsername());
+        List<Bookmark> bookmarks = bookmarkRepo.findAllByUser(users);
+        if (bookmarks.isEmpty()) return Optional.empty();
+        List<PropertyDto> propertyDtos = bookmarks.stream()
+                .map(bookmark -> new PropertyDto(bookmark.getProperty(), true))
+                .toList();
+        return Optional.of(propertyDtos);
+    }
+
+    public Optional<PropertyDto> getPropertyDetails(CustomUserDetails userDetails, Long propertyId) {
+        Property property = propertyRepo.getReferenceById(propertyId);
+        PropertyDto propertyDto = new PropertyDto(property, false);
+
+        if (userDetails != null) {
+            Users users = userRepo.existsByEmail(userDetails.getUsername());
+            Bookmark bookmark = bookmarkRepo.findByUserIdAndPropertyId(users, property);
+            if (bookmark != null) {
+                propertyDto = new PropertyDto(property, true);
+            }
+        }
+        return Optional.of(propertyDto);
+    }
+
+    public Optional<Property> getUpdatePropertyDetails(Long propertyId) {
         return propertyRepo.findById(propertyId);
     }
 
@@ -78,7 +122,7 @@ public class PropertyService {
         List<PropertyImage> savedImages = new ArrayList<>();
         if (images.isEmpty()) return savedImages;
 
-        for (MultipartFile file: images) {
+        for (MultipartFile file : images) {
             if (file.isEmpty()) continue;
 
             String imageUrl = fileService.saveImageFiles(userDetails, file, ImageType.DETAILS);
@@ -114,7 +158,7 @@ public class PropertyService {
             propertyRepo.save(property);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            response = new ApiResponse("Update property failed with "+ e.getMessage(), false);
+            response = new ApiResponse("Update property failed with " + e.getMessage(), false);
         }
         return Optional.of(response);
     }
@@ -144,7 +188,44 @@ public class PropertyService {
             propertyRepo.deleteById(propertyId);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            response = new ApiResponse("Delete property failed with "+ e.getMessage(), false);
+            response = new ApiResponse("Delete property failed with " + e.getMessage(), false);
+        }
+        return Optional.of(response);
+    }
+
+    public synchronized Optional<ApiResponse> bookmarkProperty(Long userId, Long propertyId) {
+
+        ApiResponse response = new ApiResponse("Bookmarked successfully.", true);
+        Users users = userRepo.getReferenceById(userId);
+        Property property = propertyRepo.getReferenceById(propertyId);
+        Bookmark isExist = bookmarkRepo.findByUserIdAndPropertyId(users, property);
+        try {
+            if (isExist == null) {
+                Bookmark bookmark = new Bookmark();
+                bookmark.setUsers(users);
+                bookmark.setProperty(property);
+                bookmarkRepo.save(bookmark);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            response = new ApiResponse("Bookmark is failed with " + e.getMessage(), false);
+        }
+        return Optional.of(response);
+    }
+
+    public synchronized Optional<ApiResponse> removeBookmark(Long userId, Long propertyId) {
+
+        ApiResponse response = new ApiResponse("Removed bookmark successfully.", true);
+        Users users = userRepo.getReferenceById(userId);
+        Property property = propertyRepo.getReferenceById(propertyId);
+        try {
+            Bookmark bookmark = bookmarkRepo.findByUserIdAndPropertyId(users, property);
+            if (bookmark != null) {
+                bookmarkRepo.delete(bookmark);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            response = new ApiResponse("Removed bookmark is failed with " + e.getMessage(), false);
         }
         return Optional.of(response);
     }

@@ -36,7 +36,7 @@
 </tr>
 <tr>
 <td>Website:</td>
-<td><strong><a href="web-page-url" style="color: #ffffff" target="_blank">www.renter-score.com</a></strong></td>
+<td><strong><a href="https://www.renterscore.live" style="color: #ffffff" target="_blank">https://www.renterscore.live</a></strong></td>
 </tr>
 </tbody>
 </table>
@@ -52,7 +52,7 @@
 <tbody>
 <tr>
 <td style="padding: 15px;color: #ffffff;"><strong>Innovation Technology Pte Ltd</strong><br />
-<p style="color: #ffffff">National University of Singapore</p>
+<p style="color: #ffffff">All rights reserved.</p>
 </td>
 </tr>
 </tbody>
