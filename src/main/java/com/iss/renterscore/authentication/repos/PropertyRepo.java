@@ -15,9 +15,14 @@ import java.util.List;
 public interface PropertyRepo extends JpaRepository<Property, Long> {
 
 
-    List<Property> findAllByUser(Users user);
+    @Query("SELECT p FROM Property p ORDER BY p.modifiedDate DESC")
+    List<Property> findAllOrderByModifiedDate();
 
-    List<Property> findAllByUserId(Long userId);
+    @Query("SELECT p FROM Property p WHERE p.user = :userId ORDER BY p.modifiedDate DESC")
+    List<Property> findAllByUser(@Param("userId") Users user);
+
+    @Query("SELECT p FROM Property p WHERE p.user = :user ORDER BY p.modifiedDate DESC")
+    List<Property> findAllByUserId(@Param("user") Users user);
 
     Property findByAddress_UnitNoAndAddress_BlockNoAndAddress_PostalCode(String unitNo, String blockNo, String postalCode);
 

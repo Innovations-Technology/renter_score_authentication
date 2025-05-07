@@ -37,40 +37,38 @@ public class PropertyController {
     }
 
     @GetMapping("/properties")
-    public ResponseEntity<?> getAllProperties() {
-
-        List<Property> properties = propertyService.getAllProperties()
-                .orElseThrow(() -> new ResourceNotFoundException(" All Property ", "", "Not found!"));
-
-        return ResponseEntity.ok(properties.stream().map(PropertyDto::new).toList());
-    }
-
-    @GetMapping("/detail/{id}")
-    public ResponseEntity<?> getPropertyDetails(@PathVariable("id") Long propertyId) {
-        Property properties = propertyService.getPropertyDetails(propertyId)
-                .orElseThrow(() -> new ResourceNotFoundException("Property with id ", propertyId + "", "Not found!"));
-
-        return ResponseEntity.ok(new PropertyDto(properties));
+    public ResponseEntity<?> getAllProperties(@CurrentUser CustomUserDetails currentUser) {
+        List<PropertyDto> properties = propertyService.getAllProperties(currentUser);
+        return ResponseEntity.ok(properties);
     }
 
     @GetMapping("/details/{id}")
     public ResponseEntity<?> getPropertyDetails(@CurrentUser CustomUserDetails currentUser, @PathVariable("id") Long propertyId) {
-        if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
 
-        Property properties = propertyService.getPropertyDetails(propertyId)
+        PropertyDto properties = propertyService.getPropertyDetails(currentUser, propertyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Property with id ", propertyId + "", "Not found!"));
 
-        return ResponseEntity.ok(new PropertyDto(properties));
+        return ResponseEntity.ok(properties);
+    }
+
+    @GetMapping("/update-details/{id}")
+    public ResponseEntity<?> getUpdatePropertyDetails(@CurrentUser CustomUserDetails currentUser, @PathVariable("id") Long propertyId) {
+        if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
+
+        Property properties = propertyService.getUpdatePropertyDetails(propertyId)
+                .orElseThrow(() -> new ResourceNotFoundException("Property with id ", propertyId + "", "Not found!"));
+
+        return ResponseEntity.ok(new PropertyDto(properties, false));
     }
 
     @GetMapping("/created-properties")
-    public ResponseEntity<?> getAllProperties(@CurrentUser CustomUserDetails currentUser) {
+    public ResponseEntity<?> getAllCreatedProperties(@CurrentUser CustomUserDetails currentUser) {
         if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
 
-        List<Property> properties = propertyService.getAllProperties(currentUser)
+        List<PropertyDto> properties = propertyService.getAllCreatedProperties(currentUser)
                 .orElseThrow(() -> new ResourceNotFoundException("Property with user ", currentUser.getEmail(), "Not found!"));
 
-        return ResponseEntity.ok(properties.stream().map(PropertyDto::new).toList());
+        return ResponseEntity.ok(properties);
 
     }
 
@@ -107,6 +105,34 @@ public class PropertyController {
 
         ApiResponse response = propertyService.deleteProperty(propertyId)
                 .orElseThrow(() -> new ResourceAlreadyInUseException("Property with id" + propertyId, "Property is being used!", ""));
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/bookmarked-items")
+    public ResponseEntity<?> getAllBookmarkedProperties(@CurrentUser CustomUserDetails currentUser) {
+        if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
+
+        List<PropertyDto> properties = propertyService.getAllBookmarkedProperties(currentUser)
+                .orElseThrow(() -> new ResourceNotFoundException("Property with user ", currentUser.getEmail(), "Not found!"));
+
+        return ResponseEntity.ok(properties);
+    }
+
+    @PostMapping("/bookmark/{id}")
+    public ResponseEntity<?> bookmarkProperty(@CurrentUser CustomUserDetails currentUser, @PathVariable("id") Long propertyId) {
+        if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
+
+        ApiResponse response = propertyService.bookmarkProperty(currentUser.getId(), propertyId)
+                .orElseThrow(() -> new ResourceAlreadyInUseException("Property with id" + propertyId, "Property does not exist!", ""));
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/remove-bookmark/{id}")
+    public ResponseEntity<?> unBookmarkProperty(@CurrentUser CustomUserDetails currentUser, @PathVariable("id") Long propertyId) {
+        if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
+
+        ApiResponse response = propertyService.removeBookmark(currentUser.getId(), propertyId)
+                .orElseThrow(() -> new ResourceAlreadyInUseException("Property with id" + propertyId, "Property does not exist!", ""));
         return ResponseEntity.ok(response);
     }
 

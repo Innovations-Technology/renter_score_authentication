@@ -42,7 +42,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             "/webjars/**",
             "/swagger-resources/**",
             "/actuator/**",
-            "/images/**"
+            "/ico.webp",
+            "/images/**",
+            "/resources/**", "/static/**", "/public/**"
     );
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 

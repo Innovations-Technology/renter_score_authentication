@@ -45,6 +45,8 @@ public record PropertyDto(
         UserDto user,
         @JsonProperty(value = "property_state")
         PropertyState propertyState,
+        @JsonProperty(value = "is_bookmarked")
+        Boolean isBookmarked,
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "UTC")
         @JsonProperty(value = "created_date")
         LocalDateTime createdDate,
@@ -57,7 +59,7 @@ public record PropertyDto(
         Long modifiedUser
 ) {
 
-    public PropertyDto(Property property) {
+    public PropertyDto(Property property, Boolean isBookmarked) {
         this(
                 property.getId(),
                 property.getTitle(),
@@ -80,6 +82,7 @@ public record PropertyDto(
                 property.getRentType(),
                 new UserDto(property.getUser()),
                 property.getPropertyState(),
+                isBookmarked,
                 property.getCreatedDate(),
                 property.getModifiedDate(),
                 property.getCreatedUser(),

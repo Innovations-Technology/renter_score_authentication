@@ -2,6 +2,7 @@ package com.iss.renterscore.authentication.controller;
 
 import com.iss.renterscore.authentication.events.OnUserLogoutSuccessEvent;
 import com.iss.renterscore.authentication.exceptions.ResourceNotFoundException;
+import com.iss.renterscore.authentication.exceptions.UnauthorizedException;
 import com.iss.renterscore.authentication.exceptions.UpdatePasswordException;
 import com.iss.renterscore.authentication.model.CustomUserDetails;
 import com.iss.renterscore.authentication.model.Users;
@@ -38,6 +39,7 @@ public class UserController {
     @GetMapping("/me")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_MASTER')")
     public ResponseEntity<?> getUserProfile(@CurrentUser CustomUserDetails currentUser) {
+        if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
         logger.info("Inside secured resource with user");
         Users users = userService.findByEmail(currentUser.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("User email", currentUser.getEmail(), "Not found!"));
@@ -52,7 +54,8 @@ public class UserController {
 
     @PostMapping("/update_profile")
     public ResponseEntity<?> updateProfile(@CurrentUser CustomUserDetails currentUser, @RequestPart("user") UpdateRequest request, @RequestPart(value = "file", required = false) MultipartFile file) {
-        ApiResponse response = null;
+        if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
+        ApiResponse response;
         try {
             response = userService.updateProfile(currentUser, request, file)
                     .orElseThrow(() -> new UpdatePasswordException("---Empty---", "No such user present"));
@@ -63,10 +66,11 @@ public class UserController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logoutUser(@CurrentUser CustomUserDetails customUserDetails, @Valid @RequestBody LogoutRequest logoutRequest) {
-        userService.logoutUser(customUserDetails, logoutRequest);
+    public ResponseEntity<?> logoutUser(@CurrentUser CustomUserDetails currentUser, @Valid @RequestBody LogoutRequest logoutRequest) {
+        if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
+        userService.logoutUser(currentUser, logoutRequest);
         Object credentials = SecurityContextHolder.getContext().getAuthentication().getCredentials();
-        OnUserLogoutSuccessEvent logoutSuccessEvent = new OnUserLogoutSuccessEvent(customUserDetails.getEmail(), credentials.toString(), logoutRequest);
+        OnUserLogoutSuccessEvent logoutSuccessEvent = new OnUserLogoutSuccessEvent(currentUser.getEmail(), credentials.toString(), logoutRequest);
         applicationEventPublisher.publishEvent(logoutSuccessEvent);
         return ResponseEntity.ok(new ApiResponse("Log out successful", true));
     }
