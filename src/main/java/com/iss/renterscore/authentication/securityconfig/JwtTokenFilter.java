@@ -29,7 +29,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private final String tokenRequestHeader = "Authorization";
     private final String tokenRequestHeaderPrefix = "Bearer ";
 
-    private static final Logger logger = LoggerFactory.getLogger(JwtTokenFilter.class);
+    private static final Logger loggers = LoggerFactory.getLogger(JwtTokenFilter.class);
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomUserDetailService userDetailService;
 
@@ -52,7 +52,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
         String path = request.getRequestURI();
-        logger.info("Request directory path:{}", path);
+        loggers.info("Request directory path:{}", path);
 
         boolean isExcluded = EXCLUDED_PATHS.stream().anyMatch(pattern -> pathMatcher.match(pattern, path));
         if (isExcluded) {
@@ -70,7 +70,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             }
 
         }catch (Exception e) {
-            logger.error("Failed to set user authentication: {}", String.valueOf(e));
+            loggers.error("Failed to set user authentication: {}", String.valueOf(e));
         }
 
         filterChain.doFilter(request, response);
@@ -79,7 +79,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private String getJwtFromRequest(HttpServletRequest request) {
         String barerToken = request.getHeader(tokenRequestHeader);
         if (StringUtils.hasText(barerToken) && barerToken.startsWith(tokenRequestHeaderPrefix)) {
-            logger.atDebug().log("Extracted Token:" + barerToken);
+            loggers.atDebug().log("Extracted Token:" + barerToken);
             return barerToken.replace(tokenRequestHeaderPrefix, "");
         }
         return null;
