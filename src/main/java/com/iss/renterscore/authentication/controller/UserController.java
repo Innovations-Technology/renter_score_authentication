@@ -66,9 +66,6 @@ public class UserController {
     public ResponseEntity<?> logoutUser(@CurrentUser CustomUserDetails currentUser, @Valid @RequestBody LogoutRequest logoutRequest) {
         if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
         userService.logoutUser(currentUser, logoutRequest);
-        Object credentials = SecurityContextHolder.getContext().getAuthentication().getCredentials();
-        OnUserLogoutSuccessEvent logoutSuccessEvent = new OnUserLogoutSuccessEvent(currentUser.getEmail(), credentials.toString(), logoutRequest);
-        applicationEventPublisher.publishEvent(logoutSuccessEvent);
         return ResponseEntity.ok(new ApiResponse("Log out successful", true));
     }
 }
