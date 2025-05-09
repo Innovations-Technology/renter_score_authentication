@@ -5,8 +5,10 @@ import com.iss.renterscore.authentication.exceptions.ResourceAlreadyInUseExcepti
 import com.iss.renterscore.authentication.model.*;
 import com.iss.renterscore.authentication.payloads.ApiResponse;
 import com.iss.renterscore.authentication.payloads.PropertyRequest;
+import com.iss.renterscore.authentication.payloads.RentRequest;
 import com.iss.renterscore.authentication.repos.BookmarkRepo;
 import com.iss.renterscore.authentication.repos.PropertyRepo;
+import com.iss.renterscore.authentication.repos.RentPropertyRepo;
 import com.iss.renterscore.authentication.repos.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -15,11 +17,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.iss.renterscore.authentication.utils.Utils.convertDate;
 
 @Service
 @RequiredArgsConstructor
@@ -31,13 +36,15 @@ public class PropertyService {
     private final UserRepo userRepo;
     private final FileService fileService;
     private final BookmarkRepo bookmarkRepo;
+    private final RentPropertyRepo rentPropertyRepo;
 
     // get all properties with bookmark status
     public List<PropertyDto> getAllProperties(CustomUserDetails userDetails) {
         List<PropertyDto> propertyDtos;
         List<Property> properties = propertyRepo.findAllOrderByModifiedDate();
-        Users users = userRepo.existsByEmail(userDetails.getUsername());
-        if (users != null) {
+
+        if (userDetails != null) {
+            Users users = userRepo.existsByEmail(userDetails.getUsername());
             Set<Long> bookmarkedIds = bookmarkRepo.findAllByUser(users)
                     .stream()
                     .map(bookmark -> bookmark.getProperty().getId())
@@ -228,6 +235,84 @@ public class PropertyService {
             response = new ApiResponse("Removed bookmark is failed with " + e.getMessage(), false);
         }
         return Optional.of(response);
+    }
+
+    public synchronized Optional<ApiResponse> requestRentProperty(CustomUserDetails userDetails, RentRequest request) {
+
+        ApiResponse response = new ApiResponse("Sent rent request successfully.", true);
+        Users users = userRepo.getReferenceById(userDetails.getId());
+        Property property = propertyRepo.getReferenceById(request.getPropertyId());
+        if (Boolean.TRUE.equals(existRentProperty(users, property, convertDate(request.getStartDate()), convertDate(request.getEndDate())))) {
+            throw new ResourceAlreadyInUseException("Property & Date", "Postal Code", request.getPropertyId());
+        }
+
+        RentProperty rentProperty = new RentProperty();
+        rentProperty.setTenant(users);
+
+        getUpdatedObject(request, rentProperty, property);
+
+        try {
+            rentPropertyRepo.save(rentProperty);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            response = new ApiResponse("Rent request is failed with " + e.getMessage(), false);
+        }
+        return Optional.of(response);
+    }
+
+    private Boolean existRentProperty(Users users, Property property, LocalDate startDate, LocalDate endDate) {
+        RentProperty rentProperty = rentPropertyRepo.findByTenantAndPropertyAndStartDateAndEndDate(users, property, startDate, endDate);
+        return rentProperty != null;
+    }
+
+    public synchronized Optional<ApiResponse> updateRentRequest(CustomUserDetails userDetails, Long requestId, RentRequest request) {
+
+        ApiResponse response = new ApiResponse("Update rent request successfully.", true);
+        RentProperty rentProperty = rentPropertyRepo.getReferenceById(requestId);
+        Users users = userRepo.getReferenceById(userDetails.getId());
+        Property property = propertyRepo.getReferenceById(request.getPropertyId());
+
+        getUpdatedObject(request, rentProperty, property);
+        try {
+            if (rentProperty.getRentStatus() == RentStatus.CANCELLED) {
+                rentPropertyRepo.delete(rentProperty);
+                response = new ApiResponse("Request cancelled successfully.", true);
+            } else {
+                rentPropertyRepo.save(rentProperty);
+                if (request.getRentStatus() == RentStatus.CONFIRMED) {
+                    property.setPropertyState(PropertyState.OCCUPIED);
+                    propertyRepo.save(property);
+                } else {
+                    property.setPropertyState(PropertyState.AVAILABLE);
+                    propertyRepo.save(property);
+                }
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            response = new ApiResponse("Update rent request is failed with " + e.getMessage(), false);
+        }
+        return Optional.of(response);
+    }
+
+    public void getUpdatedObject(RentRequest request, RentProperty rentProperty, Property property) {
+        rentProperty.setProperty(property);
+        rentProperty.setOwner(property.getUser());
+        rentProperty.setRentStatus(request.getRentStatus());
+        rentProperty.setStartDate(convertDate(request.getStartDate()));
+        rentProperty.setEndDate(convertDate(request.getEndDate()));
+    }
+
+    public Optional<List<RentPropertyDto>> getRequestedItems(CustomUserDetails userDetails) {
+
+        List<RentProperty> rentProperties;
+        Users users = userRepo.getReferenceById(userDetails.getId());
+        if (users.getPropertyRole() == PropertyRole.ROLE_TENANT) {
+            rentProperties = rentPropertyRepo.getAllRentPropertyByTenant(users);
+        } else {
+            rentProperties = rentPropertyRepo.getAllRentPropertyByOwner(users);
+        }
+        return Optional.of(rentProperties.stream().map(RentPropertyDto::new).toList());
+
     }
 
 }

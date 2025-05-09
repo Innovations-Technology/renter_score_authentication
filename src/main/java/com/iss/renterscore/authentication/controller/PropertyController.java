@@ -4,8 +4,10 @@ import com.iss.renterscore.authentication.exceptions.*;
 import com.iss.renterscore.authentication.model.CustomUserDetails;
 import com.iss.renterscore.authentication.model.Property;
 import com.iss.renterscore.authentication.model.PropertyDto;
+import com.iss.renterscore.authentication.model.RentPropertyDto;
 import com.iss.renterscore.authentication.payloads.ApiResponse;
 import com.iss.renterscore.authentication.payloads.PropertyRequest;
+import com.iss.renterscore.authentication.payloads.RentRequest;
 import com.iss.renterscore.authentication.service.CurrentUser;
 import com.iss.renterscore.authentication.service.PropertyService;
 import lombok.RequiredArgsConstructor;
@@ -134,6 +136,33 @@ public class PropertyController {
         ApiResponse response = propertyService.removeBookmark(currentUser.getId(), propertyId)
                 .orElseThrow(() -> new ResourceAlreadyInUseException("Property with id" + propertyId, "Property does not exist!", ""));
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/rent-request")
+    public ResponseEntity<?> requestRentProperty(@CurrentUser CustomUserDetails currentUser, @RequestBody RentRequest request) {
+        if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
+        ApiResponse response;
+        response = propertyService.requestRentProperty(currentUser, request)
+                .orElseThrow(() -> new DataAlreadyExistException("Property values :" + request.getPropertyId(), "Property already exist"));
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/update-rent-request/{id}")
+    public ResponseEntity<?> updateRentRequest(@CurrentUser CustomUserDetails currentUser, @PathVariable("id") Long requestId, @RequestBody RentRequest request) {
+        if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
+        ApiResponse response;
+        response = propertyService.updateRentRequest(currentUser, requestId, request)
+                .orElseThrow(() -> new DataAlreadyExistException("Property values :" + request.getPropertyId(), "Property already exist"));
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/requested-items")
+    public ResponseEntity<?> getRequestedItems(@CurrentUser CustomUserDetails currentUser) {
+        if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
+
+        List<RentPropertyDto> propertyDtos = propertyService.getRequestedItems(currentUser)
+                .orElseThrow(() -> new AppException(" Property doesn't already exist ", null));
+        return ResponseEntity.ok(propertyDtos);
     }
 
 }

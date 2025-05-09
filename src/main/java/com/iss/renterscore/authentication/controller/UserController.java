@@ -5,6 +5,7 @@ import com.iss.renterscore.authentication.exceptions.ResourceNotFoundException;
 import com.iss.renterscore.authentication.exceptions.UnauthorizedException;
 import com.iss.renterscore.authentication.exceptions.UpdatePasswordException;
 import com.iss.renterscore.authentication.model.CustomUserDetails;
+import com.iss.renterscore.authentication.model.UserDetailsDto;
 import com.iss.renterscore.authentication.model.Users;
 import com.iss.renterscore.authentication.payloads.ApiResponse;
 import com.iss.renterscore.authentication.payloads.LogoutRequest;
@@ -43,13 +44,10 @@ public class UserController {
         logger.info("Inside secured resource with user");
         Users users = userService.findByEmail(currentUser.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("User email", currentUser.getEmail(), "Not found!"));
-        if (users.getProfile().getProfileImage() != null && !users.getProfile().getProfileImage().isEmpty()) {
-            String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("/" + users.getProfile().getProfileImage()).toUriString();
-            users.getProfile().setProfileImage(imageUrl);
-        }
 
-        return ResponseEntity.ok(users);
+        UserDetailsDto userDetailsDto = new UserDetailsDto(users);
+
+        return ResponseEntity.ok(userDetailsDto);
     }
 
     @PostMapping("/update_profile")
