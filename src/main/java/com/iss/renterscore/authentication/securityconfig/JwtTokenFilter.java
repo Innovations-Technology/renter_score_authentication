@@ -52,7 +52,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
         String path = request.getRequestURI();
-        logger.info("Image directory path:", path);
+        logger.info("Request directory path:{}", path);
 
         boolean isExcluded = EXCLUDED_PATHS.stream().anyMatch(pattern -> pathMatcher.match(pattern, path));
         if (isExcluded) {
