@@ -43,6 +43,8 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request ->
                         request.requestMatchers("/images/**").permitAll()
+                                .requestMatchers("/api/v1/property/properties").permitAll()
+                                .requestMatchers("/api/v1/property/details/**").permitAll()
                                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**",
                                         "/swagger-ui.html", "/api-docs", "/api-docs/swagger-config", "/actuator/**",
                                         "/resources/**", "/static/**", "/ico.webp", "/public/**", "/webjars/**").permitAll()
