@@ -109,7 +109,7 @@ public class AuthController {
     }
 
     @GetMapping("/check_email_in_use")
-    public ResponseEntity<?> checkEmailInUse(@RequestParam("email") String email) {
+    public ResponseEntity<ApiResponse> checkEmailInUse(@RequestParam("email") String email) {
         Boolean emailExists = authService.emailAlreadyExist(email);
         return ResponseEntity.ok(new ApiResponse(emailExists.toString(), true));
     }

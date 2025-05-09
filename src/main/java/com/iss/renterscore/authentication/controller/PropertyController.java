@@ -39,13 +39,13 @@ public class PropertyController {
     }
 
     @GetMapping("/properties")
-    public ResponseEntity<?> getAllProperties(@CurrentUser CustomUserDetails currentUser) {
+    public ResponseEntity<List<PropertyDto>> getAllProperties(@CurrentUser CustomUserDetails currentUser) {
         List<PropertyDto> properties = propertyService.getAllProperties(currentUser);
         return ResponseEntity.ok(properties);
     }
 
     @GetMapping("/details/{id}")
-    public ResponseEntity<?> getPropertyDetails(@CurrentUser CustomUserDetails currentUser, @PathVariable("id") Long propertyId) {
+    public ResponseEntity<PropertyDto> getPropertyDetails(@CurrentUser CustomUserDetails currentUser, @PathVariable("id") Long propertyId) {
 
         PropertyDto properties = propertyService.getPropertyDetails(currentUser, propertyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Property with id ", propertyId + "", "Not found!"));
@@ -54,7 +54,7 @@ public class PropertyController {
     }
 
     @GetMapping("/update-details/{id}")
-    public ResponseEntity<?> getUpdatePropertyDetails(@CurrentUser CustomUserDetails currentUser, @PathVariable("id") Long propertyId) {
+    public ResponseEntity<PropertyDto> getUpdatePropertyDetails(@CurrentUser CustomUserDetails currentUser, @PathVariable("id") Long propertyId) {
         if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
 
         Property properties = propertyService.getUpdatePropertyDetails(propertyId)
@@ -64,7 +64,7 @@ public class PropertyController {
     }
 
     @GetMapping("/created-properties")
-    public ResponseEntity<?> getAllCreatedProperties(@CurrentUser CustomUserDetails currentUser) {
+    public ResponseEntity<List<PropertyDto>> getAllCreatedProperties(@CurrentUser CustomUserDetails currentUser) {
         if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
 
         List<PropertyDto> properties = propertyService.getAllCreatedProperties(currentUser)
@@ -75,7 +75,7 @@ public class PropertyController {
     }
 
     @PostMapping("/create-property")
-    public ResponseEntity<?> createProperty(@CurrentUser CustomUserDetails currentUser, @RequestPart("property") PropertyRequest request, @RequestPart(value = "file", required = false) List<MultipartFile> files) {
+    public ResponseEntity<ApiResponse> createProperty(@CurrentUser CustomUserDetails currentUser, @RequestPart("property") PropertyRequest request, @RequestPart(value = "file", required = false) List<MultipartFile> files) {
         if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
         ApiResponse response;
         try {
@@ -88,7 +88,7 @@ public class PropertyController {
     }
 
     @PostMapping("/update-property")
-    public ResponseEntity<?> updateProperty(@CurrentUser CustomUserDetails currentUser,  @RequestPart("id") Long propertyId, @RequestPart("property") PropertyRequest request, @RequestPart(value = "file", required = false) List<MultipartFile> files) {
+    public ResponseEntity<ApiResponse> updateProperty(@CurrentUser CustomUserDetails currentUser,  @RequestPart("id") Long propertyId, @RequestPart("property") PropertyRequest request, @RequestPart(value = "file", required = false) List<MultipartFile> files) {
         if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
         ApiResponse response;
         try {
@@ -100,9 +100,8 @@ public class PropertyController {
         return ResponseEntity.ok(response);
     }
 
-
     @PostMapping("/delete-property/{id}")
-    public ResponseEntity<?> deleteProperty(@CurrentUser CustomUserDetails currentUser, @PathVariable("id") Long propertyId) {
+    public ResponseEntity<ApiResponse> deleteProperty(@CurrentUser CustomUserDetails currentUser, @PathVariable("id") Long propertyId) {
         if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
 
         ApiResponse response = propertyService.deleteProperty(propertyId)
@@ -111,7 +110,7 @@ public class PropertyController {
     }
 
     @GetMapping("/bookmarked-items")
-    public ResponseEntity<?> getAllBookmarkedProperties(@CurrentUser CustomUserDetails currentUser) {
+    public ResponseEntity<List<PropertyDto>> getAllBookmarkedProperties(@CurrentUser CustomUserDetails currentUser) {
         if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
 
         List<PropertyDto> properties = propertyService.getAllBookmarkedProperties(currentUser)
@@ -121,7 +120,7 @@ public class PropertyController {
     }
 
     @PostMapping("/bookmark/{id}")
-    public ResponseEntity<?> bookmarkProperty(@CurrentUser CustomUserDetails currentUser, @PathVariable("id") Long propertyId) {
+    public ResponseEntity<ApiResponse> bookmarkProperty(@CurrentUser CustomUserDetails currentUser, @PathVariable("id") Long propertyId) {
         if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
 
         ApiResponse response = propertyService.bookmarkProperty(currentUser.getId(), propertyId)
@@ -130,7 +129,7 @@ public class PropertyController {
     }
 
     @PostMapping("/remove-bookmark/{id}")
-    public ResponseEntity<?> unBookmarkProperty(@CurrentUser CustomUserDetails currentUser, @PathVariable("id") Long propertyId) {
+    public ResponseEntity<ApiResponse> unBookmarkProperty(@CurrentUser CustomUserDetails currentUser, @PathVariable("id") Long propertyId) {
         if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
 
         ApiResponse response = propertyService.removeBookmark(currentUser.getId(), propertyId)
@@ -139,25 +138,23 @@ public class PropertyController {
     }
 
     @PostMapping("/rent-request")
-    public ResponseEntity<?> requestRentProperty(@CurrentUser CustomUserDetails currentUser, @RequestBody RentRequest request) {
+    public ResponseEntity<ApiResponse> requestRentProperty(@CurrentUser CustomUserDetails currentUser, @RequestBody RentRequest request) {
         if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
-        ApiResponse response;
-        response = propertyService.requestRentProperty(currentUser, request)
+        ApiResponse response = propertyService.requestRentProperty(currentUser, request)
                 .orElseThrow(() -> new DataAlreadyExistException("Property values :" + request.getPropertyId(), "Property already exist"));
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/update-rent-request/{id}")
-    public ResponseEntity<?> updateRentRequest(@CurrentUser CustomUserDetails currentUser, @PathVariable("id") Long requestId, @RequestBody RentRequest request) {
+    public ResponseEntity<ApiResponse> updateRentRequest(@CurrentUser CustomUserDetails currentUser, @PathVariable("id") Long requestId, @RequestBody RentRequest request) {
         if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
-        ApiResponse response;
-        response = propertyService.updateRentRequest(currentUser, requestId, request)
+        ApiResponse response = propertyService.updateRentRequest(currentUser, requestId, request)
                 .orElseThrow(() -> new DataAlreadyExistException("Property values :" + request.getPropertyId(), "Property already exist"));
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/requested-items")
-    public ResponseEntity<?> getRequestedItems(@CurrentUser CustomUserDetails currentUser) {
+    public ResponseEntity<List<RentPropertyDto>> getRequestedItems(@CurrentUser CustomUserDetails currentUser) {
         if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
 
         List<RentPropertyDto> propertyDtos = propertyService.getRequestedItems(currentUser)

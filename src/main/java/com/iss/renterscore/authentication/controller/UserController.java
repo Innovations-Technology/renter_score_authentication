@@ -1,6 +1,5 @@
 package com.iss.renterscore.authentication.controller;
 
-import com.iss.renterscore.authentication.events.OnUserLogoutSuccessEvent;
 import com.iss.renterscore.authentication.exceptions.ResourceNotFoundException;
 import com.iss.renterscore.authentication.exceptions.UnauthorizedException;
 import com.iss.renterscore.authentication.exceptions.UpdatePasswordException;
@@ -19,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,7 +36,7 @@ public class UserController {
 
     @GetMapping("/me")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_MASTER')")
-    public ResponseEntity<?> getUserProfile(@CurrentUser CustomUserDetails currentUser) {
+    public ResponseEntity<UserDetailsDto> getUserProfile(@CurrentUser CustomUserDetails currentUser) {
         if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
         logger.info("Inside secured resource with user");
         Users users = userService.findByEmail(currentUser.getEmail())
@@ -50,7 +48,7 @@ public class UserController {
     }
 
     @PostMapping("/update_profile")
-    public ResponseEntity<?> updateProfile(@CurrentUser CustomUserDetails currentUser, @RequestPart("user") UpdateRequest request, @RequestPart(value = "file", required = false) MultipartFile file) {
+    public ResponseEntity<ApiResponse> updateProfile(@CurrentUser CustomUserDetails currentUser, @RequestPart("user") UpdateRequest request, @RequestPart(value = "file", required = false) MultipartFile file) {
         if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
         ApiResponse response;
         try {
@@ -63,7 +61,7 @@ public class UserController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logoutUser(@CurrentUser CustomUserDetails currentUser, @Valid @RequestBody LogoutRequest logoutRequest) {
+    public ResponseEntity<ApiResponse> logoutUser(@CurrentUser CustomUserDetails currentUser, @Valid @RequestBody LogoutRequest logoutRequest) {
         if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
         userService.logoutUser(currentUser, logoutRequest);
         return ResponseEntity.ok(new ApiResponse("Log out successful", true));
