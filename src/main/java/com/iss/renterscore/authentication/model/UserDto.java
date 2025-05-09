@@ -35,7 +35,7 @@ public record UserDto(
 
     }
 
-    private static String buildImageUrl(String imagePath) {
+    static String buildImageUrl(String imagePath) {
         if (imagePath == null || imagePath.isEmpty()) return null;
 
         return ServletUriComponentsBuilder.fromCurrentContextPath()
