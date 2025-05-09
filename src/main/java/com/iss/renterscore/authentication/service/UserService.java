@@ -21,10 +21,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import java.util.Optional;
+
+import static com.iss.renterscore.authentication.utils.Utils.convertDate;
 
 @Service
 @RequiredArgsConstructor
@@ -157,9 +156,5 @@ public class UserService {
         refreshTokenService.deleteByUserId(customUserDetails);
     }
 
-    private LocalDate convertDate(String dob) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.getDefault());
-        return LocalDate.parse(dob, formatter);
-    }
 
 }

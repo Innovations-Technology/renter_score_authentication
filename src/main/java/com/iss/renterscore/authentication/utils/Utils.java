@@ -1,5 +1,8 @@
 package com.iss.renterscore.authentication.utils;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.UUID;
 
 public class Utils {
@@ -20,4 +23,8 @@ public class Utils {
         return UUID.randomUUID().toString();
     }
 
+    public static LocalDate convertDate(String date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.getDefault());
+        return LocalDate.parse(date, formatter);
+    }
 }
