@@ -3,8 +3,6 @@ package com.iss.renterscore.authentication.service;
 import com.iss.renterscore.authentication.model.CustomUserDetails;
 import com.iss.renterscore.authentication.model.ImageType;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,7 +17,6 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class FileService {
 
-    private static final Logger logger = LoggerFactory.getLogger(FileService.class);
 
 
     public String saveImageFiles(CustomUserDetails userDetails, MultipartFile file, ImageType type) throws IOException {
