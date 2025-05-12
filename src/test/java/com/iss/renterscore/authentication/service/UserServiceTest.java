@@ -8,6 +8,7 @@ import com.iss.renterscore.authentication.repos.UserRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -23,7 +24,7 @@ import static org.mockito.Mockito.when;
 
 @TestPropertySource(properties = "app.token.email.verification.duration=60000")
 @ExtendWith(MockitoExtension.class)
-public class UserServiceTest {
+ class UserServiceTest {
 
     @Mock
     private UserRepo userRepo;
@@ -76,9 +77,10 @@ public class UserServiceTest {
     void testCreateUser_EmailAlreadyExists_ThrowsException() {
         when(userRepo.existsByEmail("test@example.com")).thenReturn(testUser);
 
-        Exception exception = assertThrows(ResourceAlreadyInUseException.class, () -> {
-            userService.createUser(new RegistrationRequest("Test", "QAC", "test@example.com", "password", PropertyRole.ROLE_TENANT));
-        });
+        Executable createUserExecutable = () ->
+                userService.createUser(new RegistrationRequest("Test", "QAC", "test@example.com", "password", PropertyRole.ROLE_TENANT));
+
+        Exception exception = assertThrows(ResourceAlreadyInUseException.class, createUserExecutable);
 
         assertTrue(exception.getMessage().contains("Email"));
     }

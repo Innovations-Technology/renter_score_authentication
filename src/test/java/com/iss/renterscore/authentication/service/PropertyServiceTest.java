@@ -366,7 +366,7 @@ import static org.mockito.Mockito.*;
         rentRequest.setRentStatus(RentStatus.CONFIRMED);
 
         // Act
-        Optional<ApiResponse> result = propertyService.updateRentRequest(userDetails, 1L, rentRequest);
+        Optional<ApiResponse> result = propertyService.updateRentRequest(1L, rentRequest);
 
         // Assert
         assertTrue(result.isPresent());

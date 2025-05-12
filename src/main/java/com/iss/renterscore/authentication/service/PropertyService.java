@@ -265,11 +265,10 @@ public class PropertyService {
         return rentProperty != null;
     }
 
-    public synchronized Optional<ApiResponse> updateRentRequest(CustomUserDetails userDetails, Long requestId, RentRequest request) {
+    public synchronized Optional<ApiResponse> updateRentRequest(Long requestId, RentRequest request) {
 
         ApiResponse response = new ApiResponse("Update rent request successfully.", true);
         RentProperty rentProperty = rentPropertyRepo.getReferenceById(requestId);
-        Users users = userRepo.getReferenceById(userDetails.getId());
         Property property = propertyRepo.getReferenceById(request.getPropertyId());
 
         getUpdatedObject(request, rentProperty, property);

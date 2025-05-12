@@ -11,6 +11,7 @@ import com.iss.renterscore.authentication.securityconfig.JwtTokenProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -157,7 +158,10 @@ import static org.mockito.Mockito.*;
     void testRefreshJwtToken_TokenNotFound_ThrowsException() {
         when(refreshTokenService.findByToken("invalidToken")).thenReturn(Optional.empty());
 
-        assertThrows(TokenRefreshException.class, () -> authService.refreshJwtToken(new TokenRefreshRequest("invalidToken")));
+        Executable refreshJwtTokenExecutable = () ->
+                authService.refreshJwtToken(new TokenRefreshRequest("invalidToken"));
+
+        assertThrows(TokenRefreshException.class, refreshJwtTokenExecutable);
     }
 
     @Test
