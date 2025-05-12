@@ -358,7 +358,6 @@ import static org.mockito.Mockito.*;
         rentProperty.setRentStatus(RentStatus.REQUESTED);
 
         when(rentPropertyRepo.getReferenceById(1L)).thenReturn(rentProperty);
-        when(userRepo.getReferenceById(1L)).thenReturn(user);
         when(propertyRepo.getReferenceById(1L)).thenReturn(property);
         when(rentPropertyRepo.save(any())).thenReturn(rentProperty);
         when(propertyRepo.save(any())).thenReturn(property);
