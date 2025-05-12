@@ -23,7 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "https://renterscore.live", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/user")
 @RequiredArgsConstructor
