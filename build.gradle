@@ -101,7 +101,7 @@ tasks.named('jacocoTestReport', JacocoReport) {
 
 	classDirectories.setFrom(fileTree(dir: "$buildDir/classes/java/main", excludes: ['**/config/**', '**/dto/**']))
 	sourceDirectories.setFrom(files('src/main/java'))
-	executionData.setFrom(fileTree(dir: buildDir, includes: ['jacoco/test.exec', 'jacoco/test*.exec']))
+	executionData.setFrom(fileTree(dir: buildDir, includes: ['jacoco/test.exec', 'jacoco/test*.exec', 'jacoco/*.exec']))
 }
 
 tasks.named("jacocoTestCoverageVerification", JacocoCoverageVerification) {
@@ -110,14 +110,14 @@ tasks.named("jacocoTestCoverageVerification", JacocoCoverageVerification) {
 	violationRules {
 		rule {
 			limit {
-				minimum = 0.10
+				minimum = 0.50
 			}
 		}
 	}
 
 	classDirectories.setFrom(fileTree(dir: "$buildDir/classes/java/main", excludes: ['**/config/**', '**/dto/**']))
 	sourceDirectories.setFrom(files('src/main/java'))
-	executionData.setFrom(fileTree(dir: buildDir, includes: ['jacoco/test.exec']))
+	executionData.setFrom(fileTree(dir: buildDir, includes: ['jacoco/test.exec', 'jacoco/test*.exec', 'jacoco/*.exec']))
 }
 check.dependsOn tasks.named("jacocoTestCoverageVerification")
 
