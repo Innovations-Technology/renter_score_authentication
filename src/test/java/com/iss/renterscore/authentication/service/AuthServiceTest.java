@@ -14,11 +14,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 
 import java.time.Instant;
@@ -31,9 +28,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @TestPropertySource(properties = "app.token.refresh.duration=60000")
 @TestPropertySource(properties = "app.token.email.verification.duration=60000")
-public class AuthServiceTest {
+ class AuthServiceTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthServiceTest.class);
 
     @Mock
     private UserService userService;
@@ -45,13 +41,7 @@ public class AuthServiceTest {
     private RefreshTokenService refreshTokenService;
 
     @Mock
-    private PasswordEncoder passwordEncoder;
-
-    @Mock
     private AuthenticationManager authenticationManager;
-
-    @Mock
-    private PasswordResetTokenService passwordResetTokenService;
 
     @InjectMocks
     private AuthService authService;
