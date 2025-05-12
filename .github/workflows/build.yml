@@ -3,8 +3,7 @@ on:
   push:
     branches:
       - develop
-  pull_request:
-    types: [opened, synchronize, reopened]
+      - main
 jobs:
   build:
     name: Build and analyze
