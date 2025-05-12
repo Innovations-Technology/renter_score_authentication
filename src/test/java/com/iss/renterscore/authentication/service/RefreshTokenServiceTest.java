@@ -19,7 +19,7 @@ import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @TestPropertySource(properties = "app.token.refresh.duration=900000")
-public class RefreshTokenServiceTest {
+ class RefreshTokenServiceTest {
 
     @Mock
     private RefreshTokenRepo refreshTokenRepo;
@@ -99,9 +99,7 @@ public class RefreshTokenServiceTest {
         expiredToken.setToken("expiredToken");
         expiredToken.setExpiryDate(Instant.now().minusMillis(1000));
 
-        Exception exception = assertThrows(TokenRefreshException.class, () -> {
-            refreshTokenService.verifyExpiration(expiredToken);
-        });
+        Exception exception = assertThrows(TokenRefreshException.class, () -> refreshTokenService.verifyExpiration(expiredToken));
 
         assertTrue(exception.getMessage().contains("Expired token"));
     }
