@@ -11,8 +11,6 @@ import com.iss.renterscore.authentication.payloads.RentRequest;
 import com.iss.renterscore.authentication.service.CurrentUser;
 import com.iss.renterscore.authentication.service.PropertyService;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,23 +18,13 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "https://renterscore.live", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/property")
 @RequiredArgsConstructor
 public class PropertyController {
 
-    private static final Logger logger = LoggerFactory.getLogger(PropertyController.class);
-
     private final PropertyService propertyService;
-
-    @GetMapping(value = "/hello-auth")
-    public ResponseEntity<String> helloGreeting() {
-
-        return ResponseEntity.ok()
-                .body("<h1>Welcome to Renter Score Application</h1>" +
-                        "<br /><br /><p><h3>This application is to enhance the Properties' solutions. </h3></p>");
-    }
 
     @GetMapping("/properties")
     public ResponseEntity<List<PropertyDto>> getAllProperties(@CurrentUser CustomUserDetails currentUser) {

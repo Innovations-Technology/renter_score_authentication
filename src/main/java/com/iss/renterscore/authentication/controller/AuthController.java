@@ -27,7 +27,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.Optional;
 
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "https://renterscore.live", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
