@@ -136,7 +136,7 @@ public class PropertyController {
     @PostMapping("/update-rent-request/{id}")
     public ResponseEntity<ApiResponse> updateRentRequest(@CurrentUser CustomUserDetails currentUser, @PathVariable("id") Long requestId, @RequestBody RentRequest request) {
         if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
-        ApiResponse response = propertyService.updateRentRequest(currentUser, requestId, request)
+        ApiResponse response = propertyService.updateRentRequest(requestId, request)
                 .orElseThrow(() -> new DataAlreadyExistException("Property values :" + request.getPropertyId(), "Property already exist"));
         return ResponseEntity.ok(response);
     }
