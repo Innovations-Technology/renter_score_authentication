@@ -1,5 +1,7 @@
 package com.iss.renterscore.authentication.model;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iss.renterscore.authentication.payloads.PropertyRequest;
 import org.junit.jupiter.api.Test;
 
@@ -171,5 +173,21 @@ class PropertyRequestTest {
         // Assert
         assertTrue(toString.contains("Test Property"));
         assertTrue(toString.contains("1000"));
+    }
+
+    @Test
+    void testJsonSerialization() throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        PropertyRequest request = new PropertyRequest();
+        request.setTitle("Test");
+        request.setPropertyType(PropertyType.HDB);
+
+        String json = mapper.writeValueAsString(request);
+        assertTrue(json.contains("Test"));
+        assertTrue(json.contains("HDB"));
+
+        PropertyRequest deserialized = mapper.readValue(json, PropertyRequest.class);
+        assertEquals("Test", deserialized.getTitle());
+        assertEquals(PropertyType.HDB, deserialized.getPropertyType());
     }
 }
