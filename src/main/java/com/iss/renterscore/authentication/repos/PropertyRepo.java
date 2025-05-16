@@ -15,7 +15,7 @@ import java.util.List;
 public interface PropertyRepo extends JpaRepository<Property, Long> {
 
 
-    @Query("SELECT p FROM Property p ORDER BY p.modifiedDate DESC")
+    @Query("SELECT p FROM Property p WHERE p.propertyState != 'SUSPENDED' ORDER BY p.modifiedDate DESC")
     List<Property> findAllOrderByModifiedDate();
 
     @Query("SELECT p FROM Property p WHERE p.user = :userId ORDER BY p.modifiedDate DESC")
