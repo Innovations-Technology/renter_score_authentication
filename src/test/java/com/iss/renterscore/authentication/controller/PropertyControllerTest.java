@@ -254,7 +254,7 @@ class PropertyControllerTest {
         when(propertyService.removeBookmark(1L, 1L)).thenReturn(Optional.of(expectedResponse));
 
         // Act
-        ResponseEntity<ApiResponse> response = propertyController.unBookmarkProperty(currentUser, 1L);
+        ResponseEntity<ApiResponse> response = propertyController.removeBookmarkProperty(currentUser, 1L);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
