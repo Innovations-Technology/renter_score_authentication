@@ -60,6 +60,7 @@ public class AuthController {
                 }).orElseThrow(() -> new UserRegistrationException(request.getEmail(), "Missing user Data in record"));
     }
 
+    // Not using this function but added route
     @GetMapping("/registration_confirmation")
     public ResponseEntity<?> confirmRegistration(@RequestParam("token") String token) {
         return authService.confirmEmailRegistration(token)
@@ -74,22 +75,6 @@ public class AuthController {
                 .orElseThrow(() -> new InvalidTokenRequestException("Email Verification Token", request.getToken(), "Failed to verify. Please request a new email verification"));
     }
 
-    @GetMapping("/resend_registration_token")
-    public ResponseEntity<?> resendRegistrationToken(@RequestParam("token") String existingToken) {
-        Users users = authService.recreateRegistrationToken(existingToken)
-                .orElseThrow(() -> new InvalidTokenRequestException("Email Verification Token", existingToken, "User already verified."));
-        return Optional.ofNullable(users)
-                .map(registeredUser -> {
-                    String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
-                    UriComponentsBuilder urlBuilder = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/v1/auth/registration_confirmation");
-                    OnRegenerateEmailVerificationEvent regenerateEmailVerificationEvent =
-                            new OnRegenerateEmailVerificationEvent(urlBuilder, registeredUser, baseUrl);
-                    applicationEventPublisher.publishEvent(regenerateEmailVerificationEvent);
-                    return ResponseEntity.ok(new ApiResponse("Email verification token resent successfully", true));
-
-                }).orElseThrow(() -> new InvalidTokenRequestException("Email Verification Token", existingToken, "No user associated with this request."));
-
-    }
 
     @PostMapping("/resend_verification_token")
     public ResponseEntity<?> resendRegistrationToken(@Valid @RequestBody EmailVerificationTokenRequest request) {
@@ -106,12 +91,6 @@ public class AuthController {
 
                 }).orElseThrow(() -> new InvalidTokenRequestException("Email Verification Token", request.getEmail(), "No user associated with this request."));
 
-    }
-
-    @GetMapping("/check_email_in_use")
-    public ResponseEntity<ApiResponse> checkEmailInUse(@RequestParam("email") String email) {
-        Boolean emailExists = authService.emailAlreadyExist(email);
-        return ResponseEntity.ok(new ApiResponse(emailExists.toString(), true));
     }
 
     @PostMapping("/login")

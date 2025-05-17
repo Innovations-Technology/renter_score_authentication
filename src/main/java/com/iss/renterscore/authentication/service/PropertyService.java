@@ -191,6 +191,11 @@ public class PropertyService {
     public synchronized Optional<ApiResponse> deleteProperty(Long propertyId) {
 
         ApiResponse response = new ApiResponse("Property deleted successfully.", true);
+        Property property = propertyRepo.getReferenceById(propertyId);
+        if (property.getPropertyState().equals(PropertyState.OCCUPIED)) {
+            response = new ApiResponse("Occupied property cannot be deleted.", false);
+            return Optional.of(response);
+        }
         try {
             propertyRepo.deleteById(propertyId);
         } catch (Exception e) {
