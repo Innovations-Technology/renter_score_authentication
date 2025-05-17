@@ -117,7 +117,7 @@ public class PropertyController {
     }
 
     @PostMapping("/remove-bookmark/{id}")
-    public ResponseEntity<ApiResponse> unBookmarkProperty(@CurrentUser CustomUserDetails currentUser, @PathVariable("id") Long propertyId) {
+    public ResponseEntity<ApiResponse> removeBookmarkProperty(@CurrentUser CustomUserDetails currentUser, @PathVariable("id") Long propertyId) {
         if (currentUser == null) throw new UnauthorizedException("User is not authorized!");
 
         ApiResponse response = propertyService.removeBookmark(currentUser.getId(), propertyId)

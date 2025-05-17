@@ -32,7 +32,6 @@ public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     private final UserService userService;
-    private final ApplicationEventPublisher applicationEventPublisher;
 
     @GetMapping("/me")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_MASTER')")
