@@ -288,6 +288,11 @@ import static org.mockito.Mockito.*;
     @Test
     void deleteProperty_Success_ReturnsSuccessResponse() {
         // Arrange
+        property = new Property();
+        property.setId(1L);
+        property.setPropertyState(PropertyState.AVAILABLE); // not OCCUPIED
+
+        when(propertyRepo.getReferenceById(1L)).thenReturn(property);
         doNothing().when(propertyRepo).deleteById(1L);
 
         // Act

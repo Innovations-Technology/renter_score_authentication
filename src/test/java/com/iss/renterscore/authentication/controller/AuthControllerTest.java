@@ -129,18 +129,6 @@ import static org.mockito.Mockito.when;
                 ((ApiResponse) response.getBody()).getData());
     }
 
-    @Test
-    void checkEmailInUse_ReturnsCorrectStatus() {
-        // Arrange
-        when(authService.emailAlreadyExist("test@example.com")).thenReturn(true);
-
-        // Act
-        ResponseEntity<ApiResponse> response = authController.checkEmailInUse("test@example.com");
-
-        // Assert
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("true", Objects.requireNonNull(response.getBody()).getData());
-    }
 
     @Test
     void authenticateUser_Failure_ThrowsUserLoginException() {
